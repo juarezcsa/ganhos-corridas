@@ -1,0 +1,10 @@
+# Tooling / scaffolding (não faz parte do app)
+.agents/
+.specsfy/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Node (caso venha a usar no futuro)
+node_modules/
