@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f1720">
+<meta name="theme-color" content="#0a0f0d">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,728 +13,602 @@
 <title>Ganhos de Corridas — Juarez</title>
 <style>
 :root{
-  --bg:#0f1720; --panel:#18232e; --panel2:#202e3a; --line:#314351;
-  --text:#eef4f7; --muted:#a8b8c4; --accent:#65d39a; --accent2:#f0c86b;
-  --danger:#ff7b7b; --blue:#7bb9ff; --shadow:0 12px 35px rgba(0,0,0,.24);
+  --bg:#0a0f0d; --bg2:#0f1512; --card:#141b17; --card2:#1a231e;
+  --line:#232e28; --line2:#2c3a32;
+  --text:#f3f7f4; --muted:#8b9a91; --faint:#5c6b62;
+  --accent:#b6f04a; --accent-dim:#7ea62f;
+  --blue:#8aa0ff; --violet:#b79cff; --amber:#f0c86b; --red:#ff8d8d;
+  --radius:22px; --radius-sm:16px;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
-body{margin:0;background:linear-gradient(180deg,#0c131a,var(--bg));color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45}
-a{color:var(--blue)}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.app{max-width:1120px;margin:auto;padding:16px 16px 108px}
-.hero{background:linear-gradient(135deg,#1c2e32,#18232e 60%,#242d31);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow)}
-.hero h1{margin:0 0 6px;font-size:clamp(1.6rem,5vw,2.5rem)}
-.hero p{margin:.35rem 0;color:var(--muted)}
-.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.badge{border:1px solid var(--line);background:#14202a;border-radius:999px;padding:7px 10px;font-size:.86rem}
-/* barra de tarefas flutuante inferior */
-.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:40;display:flex;gap:4px;background:rgba(24,35,46,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:20px;padding:8px;box-shadow:var(--shadow);width:min(440px,calc(100vw - 28px))}
-.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:var(--muted);padding:8px 4px;border-radius:14px;font-size:.72rem;font-weight:600;transition:background .15s,color .15s}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  line-height:1.4;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+input,textarea,select{width:100%}
+.wrap{max-width:520px;margin:0 auto;padding:22px 18px calc(112px + env(safe-area-inset-bottom))}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.top .hello{font-size:.82rem;color:var(--muted)}
+.top .title{font-size:1.35rem;font-weight:700;letter-spacing:-.02em;margin-top:2px}
+.iconbtn{width:42px;height:42px;border-radius:14px;background:var(--card);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;color:var(--text)}
+.iconbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+/* filtro/segment */
+.seg{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px;margin-bottom:20px}
+.seg button{flex:1;padding:9px 6px;border-radius:999px;font-size:.82rem;font-weight:600;color:var(--muted);transition:.15s}
+.seg button.on{background:var(--accent);color:#12220a}
+
+/* big balance */
+.balance{margin:6px 2px 4px}
+.balance .lbl{color:var(--muted);font-size:.86rem;margin-bottom:6px}
+.balance .amt{font-size:2.7rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.balance .amt .cents{font-size:1.5rem;color:var(--muted);font-weight:700}
+.balance .sub{margin-top:10px;font-size:.84rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;font-size:.76rem;font-weight:700}
+.tag.up{background:rgba(182,240,74,.14);color:var(--accent)}
+.tag.down{background:rgba(255,141,141,.14);color:var(--red)}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.card + .card{margin-top:14px}
+.card h3{margin:0 0 14px;font-size:1rem;font-weight:700}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:26px 2px 12px}
+.section-title h2{font-size:1.05rem;font-weight:700;margin:0}
+.section-title .link{color:var(--muted);font-size:.82rem;font-weight:600}
+
+/* stat pair */
+.stats2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);padding:15px}
+.stat .ic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.stat .ic svg{width:18px;height:18px;stroke:#12220a;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.stat .ic.green{background:var(--accent)} .stat .ic.violet{background:var(--violet)}
+.stat .ic.blue{background:var(--blue)} .stat .ic.amber{background:var(--amber)}
+.stat .v{font-size:1.28rem;font-weight:800;letter-spacing:-.02em}
+.stat .k{color:var(--muted);font-size:.78rem;margin-top:2px}
+
+/* mini metrics row inside card */
+.mrow{display:flex;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line)}
+.mrow:first-of-type{border-top:0}
+.mrow .k{color:var(--muted);font-size:.88rem}
+.mrow .v{font-weight:700;font-variant-numeric:tabular-nums}
+.v.good{color:var(--accent)} .v.bad{color:var(--red)}
+
+/* chart */
+.chart-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.chart-head .big{font-size:1.6rem;font-weight:800;letter-spacing:-.02em}
+.chart-head .k{color:var(--muted);font-size:.8rem}
+svg.line{display:block;width:100%;height:150px;overflow:visible}
+.xlabels{display:flex;justify-content:space-between;margin-top:8px;color:var(--faint);font-size:.72rem}
+
+/* history */
+.hist{display:flex;align-items:center;gap:13px;padding:14px 0;border-top:1px solid var(--line)}
+.hist:first-of-type{border-top:0}
+.hist .av{width:44px;height:44px;border-radius:14px;background:var(--card2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent)}
+.hist .av svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hist .mid{flex:1;min-width:0}
+.hist .mid .t{font-weight:700;font-size:.95rem}
+.hist .mid .s{color:var(--muted);font-size:.78rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist .amt{text-align:right;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hist .amt small{display:block;color:var(--muted);font-weight:600;font-size:.72rem}
+
+/* form */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:7px}
+.field .in{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:0 14px}
+.field .in:focus-within{border-color:var(--accent-dim)}
+.field .in .pre{color:var(--faint);font-size:.9rem}
+.field input,.field textarea,.field select{background:transparent;border:0;outline:0;padding:13px 0;font-size:1rem}
+.field textarea{min-height:64px;resize:vertical;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:16px;
+  font-weight:750;font-size:1rem;background:var(--accent);color:#12220a}
+.btn svg{width:19px;height:19px;stroke:#12220a;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn.ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.btn.ghost svg{stroke:var(--text)}
+.btn.danger{background:rgba(255,141,141,.12);color:var(--red);border:1px solid rgba(255,141,141,.25)}
+.btn.danger svg{stroke:var(--red)}
+.btn.sm{padding:11px;font-size:.9rem;border-radius:13px}
+.btnrow{display:flex;gap:10px;margin-top:16px}
+
+.live{background:var(--bg2);border:1px dashed var(--line2);border-radius:var(--radius-sm);padding:15px;margin-top:6px}
+.live .lt{color:var(--muted);font-size:.8rem;margin-bottom:10px}
+
+/* empty */
+.empty{text-align:center;color:var(--muted);padding:34px 10px;font-size:.9rem}
+.empty svg{width:40px;height:40px;stroke:var(--faint);fill:none;stroke-width:1.6;margin-bottom:12px}
+
+/* tabbar */
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));
+  z-index:40;display:flex;gap:2px;background:rgba(18,25,21,.86);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--line2);border-radius:22px;padding:7px;box-shadow:0 14px 40px rgba(0,0,0,.5);
+  width:min(340px,calc(100vw - 36px))}
+.tabbar button{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;height:48px;border-radius:16px;color:var(--muted);transition:.18s}
 .tabbar button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.tabbar button.active{background:var(--accent);color:#082017}
-.tabbar button:active{transform:scale(.94)}
-/* menu "Mais" (bottom sheet) */
-.sheet-overlay{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s}
-.sheet-overlay.open{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:50%;transform:translateX(-50%) translateY(120%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:46;width:min(440px,calc(100vw - 28px));background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:10px;box-shadow:var(--shadow);transition:transform .22s ease}
-.sheet.open{transform:translateX(-50%) translateY(0)}
-.sheet h4{margin:6px 10px 10px;color:var(--muted);font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-.sheet-item{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:var(--text);padding:13px 12px;border-radius:12px;font-size:1rem;font-weight:600;text-align:left}
-.sheet-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:var(--accent)}
-.sheet-item:hover,.sheet-item:active{background:var(--panel2)}
-.sheet-item.active{background:var(--panel2);outline:1px solid var(--accent)}
-.section{display:none}
-.section.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-.card{grid-column:span 12;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
-.card h2,.card h3{margin-top:0}
-.metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.metric{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px}
-.metric b{font-size:1.3rem;display:block}
-.metric.good b{color:var(--accent)}
-.metric.warn b{color:var(--accent2)}
-.metric.bad b{color:var(--danger)}
-.muted{color:var(--muted)}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-label{display:block;font-size:.86rem;color:var(--muted)}
-input,select,textarea{width:100%;margin-top:5px;border:1px solid var(--line);background:#101a22;color:var(--text);border-radius:10px;padding:10px}
-textarea{min-height:70px;resize:vertical}
-.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:750;background:var(--accent);color:#092018}
-.btn.secondary{background:#2a3945;color:var(--text);border:1px solid var(--line)}
-.btn.warn{background:var(--accent2);color:#2a210b}
-.btn.danger{background:#4a2529;color:#ffd7d7;border:1px solid #744148}
-.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
-.history-item{border:1px solid var(--line);border-radius:15px;padding:14px;margin:10px 0;background:var(--panel2)}
-.history-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
-.history-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
-.hi-cell{background:#17242e;border:1px solid var(--line);border-radius:10px;padding:8px}
-.hi-cell span{display:block;color:var(--muted);font-size:.76rem}
-.hi-cell b{font-size:1.02rem}
-.small{font-size:.84rem}
-.notice{background:#122821;border:1px solid #2c644e;border-radius:14px;padding:13px}
-.notice.warn{background:#2b2514;border-color:#6d5c29}
-.bar-row{display:flex;align-items:center;gap:8px;margin:6px 0}
-.bar-row .lbl{width:96px;color:var(--muted);font-size:.82rem;flex-shrink:0}
-.bar-track{flex:1;height:14px;background:#25343f;border-radius:999px;overflow:hidden}
-.bar-fill{height:100%;background:var(--accent);border-radius:999px}
-.bar-row .val{width:92px;text-align:right;font-size:.82rem}
-.hide{display:none!important}
-.empty{text-align:center;color:var(--muted);padding:24px}
-details{border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:10px;background:#14202a}
-summary{cursor:pointer;font-weight:700}
-.result-live{margin-top:12px;padding:12px;border-radius:12px;background:#111d25;border:1px solid var(--line)}
-.result-live .rl-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
-.split{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line)}
-.split:last-child{border-bottom:0}
-.split b{font-variant-numeric:tabular-nums}
-@media(min-width:760px){
- .card.half{grid-column:span 6}
- .metric-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
- .form-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
- .history-metrics{grid-template-columns:repeat(4,minmax(0,1fr))}
- .result-live .rl-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-@media print{
- body{background:white;color:black}
- .tabbar,.sheet,.sheet-overlay,.actions{display:none!important}
- .section{display:block!important}
- .card,.hero{box-shadow:none;border:1px solid #bbb;background:white}
-}
+.tabbar button .lab{font-size:.82rem;font-weight:700;max-width:0;overflow:hidden;opacity:0;transition:.2s;white-space:nowrap}
+.tabbar button.on{background:var(--accent);color:#12220a;flex:1.7}
+.tabbar button.on .lab{max-width:80px;opacity:1}
+.tabbar button:active{transform:scale(.93)}
+
+/* sheet */
+.ov{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.2s}
+.ov.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:46;background:var(--card);
+  border-top-left-radius:26px;border-top-right-radius:26px;border-top:1px solid var(--line2);
+  padding:10px 16px calc(20px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .26s cubic-bezier(.4,1.2,.5,1);
+  max-width:520px;margin:0 auto}
+.sheet.open{transform:translateY(0)}
+.sheet .grab{width:38px;height:4px;border-radius:999px;background:var(--line2);margin:8px auto 14px}
+.sheet-item{display:flex;align-items:center;gap:14px;width:100%;padding:15px 8px;border-radius:14px;font-size:1rem;font-weight:650;text-align:left}
+.sheet-item .si{width:40px;height:40px;border-radius:13px;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.sheet-item .si svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sheet-item .chev{margin-left:auto;color:var(--faint)}
+.sheet-item .chev svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sheet-item.on{background:var(--card2)}
+.sheet-item:active{background:var(--card2)}
+
+/* toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(96px + env(safe-area-inset-bottom));
+  z-index:60;background:var(--accent);color:#12220a;font-weight:700;font-size:.9rem;padding:12px 20px;border-radius:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.fadein{animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+@media(max-width:360px){ .balance .amt{font-size:2.3rem} }
 </style>
 </head>
 <body>
-<div class="app">
-  <header class="hero">
-    <h1>Ganhos de corridas — Juarez</h1>
-    <p>Registre cada período de corridas e veja seu ganho líquido de forma rápida e simples.</p>
-    <div class="badges">
-      <span class="badge" id="badgeTotalPeriodos">0 períodos</span>
-      <span class="badge" id="badgeSaldoTotal">Saldo total: R$ 0,00</span>
-      <span class="badge" id="badgeRhMedio">R$/h médio: —</span>
-    </div>
-  </header>
+<div id="root"></div>
 
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="section active">
-    <div class="grid">
-      <div class="card">
-        <h2>Último período</h2>
-        <div class="metric-grid" id="lastMetrics"></div>
-        <p class="muted small" id="lastSubtitle" style="margin-top:10px"></p>
-      </div>
-
-      <div class="card half">
-        <h3>Resumo geral</h3>
-        <div class="metric-grid" id="totalMetrics"></div>
-      </div>
-
-      <div class="card half">
-        <h3>Ganho líquido estimado</h3>
-        <p class="muted small">Saldo do combustível menos depreciação, seguro e manutenção (configuráveis na aba Custos).</p>
-        <div class="metric-grid" id="netMetrics"></div>
-      </div>
-
-      <div class="card">
-        <h3>Faturamento por período (últimos 12)</h3>
-        <div id="chartFaturamento"></div>
-      </div>
-
-      <div class="card">
-        <h3>R$/hora por período (últimos 12)</h3>
-        <div id="chartRh"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REGISTRAR -->
-  <section id="registrar" class="section">
-    <div class="grid">
-      <div class="card">
-        <h2 id="formTitle">Registrar período</h2>
-        <p class="muted small">Preencha o que você anota. O saldo e as métricas são calculados automaticamente.</p>
-        <div class="form-grid" style="margin-top:12px">
-          <div>
-            <label>Data</label>
-            <input type="date" id="fData">
-          </div>
-          <div>
-            <label>Faturamento (R$)</label>
-            <input type="number" inputmode="decimal" step="0.01" id="fFaturamento" placeholder="188,75">
-          </div>
-          <div>
-            <label>Horas trabalhadas</label>
-            <input type="number" inputmode="decimal" step="0.1" id="fHoras" placeholder="5,5">
-          </div>
-          <div>
-            <label>KM rodados</label>
-            <input type="number" inputmode="decimal" step="0.1" id="fKm" placeholder="86,9">
-          </div>
-          <div>
-            <label>Consumo (km/L)</label>
-            <input type="number" inputmode="decimal" step="0.1" id="fConsumo" placeholder="10,0">
-          </div>
-          <div>
-            <label>Preço combustível (R$/L)</label>
-            <input type="number" inputmode="decimal" step="0.01" id="fPreco" placeholder="7,00">
-          </div>
-          <div>
-            <label>Corridas (opcional)</label>
-            <input type="number" inputmode="numeric" step="1" id="fCorridas" placeholder="12">
-          </div>
-        </div>
-        <div>
-          <label>Observações (opcional)</label>
-          <textarea id="fObs" placeholder="Chuva, região, plataforma..."></textarea>
-        </div>
-
-        <div class="result-live" id="liveResult"></div>
-
-        <div class="actions">
-          <button class="btn" onclick="salvarPeriodo()">Salvar período</button>
-          <button class="btn secondary" onclick="preencherExemplo()">Preencher exemplo</button>
-          <button class="btn secondary" id="cancelEditBtn" onclick="cancelarEdicao()" style="display:none">Cancelar edição</button>
-          <button class="btn secondary" onclick="limparForm()">Limpar</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- HISTORICO -->
-  <section id="historico" class="section">
-    <div class="grid">
-      <div class="card">
-        <h2>Histórico</h2>
-        <div id="historyList"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONFIG / CUSTOS -->
-  <section id="config" class="section">
-    <div class="grid">
-      <div class="card">
-        <h2>Custos por km (líquido)</h2>
-        <p class="muted small">Além do combustível, você quer descontar depreciação, seguro e manutenção. Informe quanto gasta por km em cada item. Deixe em zero se não quiser considerar.</p>
-        <div class="form-grid" style="margin-top:12px">
-          <div>
-            <label>Depreciação (R$/km)</label>
-            <input type="number" inputmode="decimal" step="0.01" id="cDepreciacao" placeholder="0,15">
-          </div>
-          <div>
-            <label>Manutenção (R$/km)</label>
-            <input type="number" inputmode="decimal" step="0.01" id="cManutencao" placeholder="0,10">
-          </div>
-          <div>
-            <label>Seguro (R$/km)</label>
-            <input type="number" inputmode="decimal" step="0.01" id="cSeguro" placeholder="0,05">
-          </div>
-          <div>
-            <label>Outros (R$/km)</label>
-            <input type="number" inputmode="decimal" step="0.01" id="cOutros" placeholder="0,00">
-          </div>
-        </div>
-        <div class="notice" style="margin-top:12px">
-          Total de custos extras: <b id="custoTotalKm">R$ 0,00 / km</b>. Esses valores são descontados do saldo do combustível para estimar o <b>ganho líquido</b>.
-        </div>
-        <div class="actions">
-          <button class="btn" onclick="salvarConfig()">Salvar custos</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- EXPORTAR -->
-  <section id="exportar" class="section">
-    <div class="grid">
-      <div class="card half">
-        <h3>Backup e restauração</h3>
-        <p class="muted small">Seus dados ficam salvos apenas neste dispositivo (localStorage). Faça backup para não perder.</p>
-        <div class="actions">
-          <button class="btn" onclick="exportarJSON()">Exportar backup (JSON)</button>
-          <button class="btn secondary" onclick="document.getElementById('importFile').click()">Importar backup</button>
-          <input type="file" id="importFile" accept="application/json" class="hide" onchange="importarJSON(event)">
-        </div>
-      </div>
-      <div class="card half">
-        <h3>Relatório</h3>
-        <p class="muted small">Exporte um resumo em Markdown de todos os períodos.</p>
-        <div class="actions">
-          <button class="btn secondary" onclick="exportarMarkdown()">Exportar Markdown</button>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Zona de risco</h3>
-        <div class="actions">
-          <button class="btn danger" onclick="apagarTudo()">Apagar todos os dados</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- overlay + menu "Mais" -->
-  <div class="sheet-overlay" id="sheetOverlay" onclick="fecharMais()"></div>
-  <div class="sheet" id="moreSheet" role="menu" aria-label="Mais opções">
-    <h4>Mais opções</h4>
-    <button class="sheet-item" data-tab="config" role="menuitem">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      Custos por km
-    </button>
-    <button class="sheet-item" data-tab="exportar" role="menuitem">
-      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Backup e exportar
-    </button>
-  </div>
-
-  <!-- barra de tarefas flutuante -->
-  <nav class="tabbar" role="tablist" aria-label="Navegação">
-    <button class="active" data-tab="dashboard">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-      Painel
-    </button>
-    <button data-tab="registrar">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-      Registrar
-    </button>
-    <button data-tab="historico">
-      <svg viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
-      Histórico
-    </button>
-    <button id="moreBtn" onclick="abrirMais()" aria-haspopup="true">
-      <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
-      Mais
-    </button>
-  </nav>
-</div>
-
-<script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
 const STORAGE_KEY = "ganhos_corridas_juarez_v1";
 
-const defaultState = {
-  periodos: [],
-  custos: { depreciacao:0, manutencao:0, seguro:0, outros:0 }
+/* ---------- helpers ---------- */
+const num = v => { const n = parseFloat(String(v).replace(',', '.')); return isNaN(n) ? 0 : n; };
+const brl = v => (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const brlParts = v => {
+  const s = brl(v);
+  const i = s.lastIndexOf(',');
+  return i>=0 ? [s.slice(0,i), s.slice(i)] : [s, ''];
 };
+const n1 = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const n2 = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate = iso => { if(!iso) return "—"; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; };
+const fmtShort = iso => { if(!iso) return ""; const [,m,d]=iso.split('-'); const mm=["","jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"]; return `${d}/${mm[parseInt(m,10)]}`; };
+const todayISO = () => new Date().toISOString().slice(0,10);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 
-let state = loadState();
-let editId = null;
-
+const defaultState = { periodos:[], custos:{depreciacao:0,manutencao:0,seguro:0,outros:0} };
 function loadState(){
   try{
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if(saved){
-      const parsed = JSON.parse(saved);
-      return {
-        periodos: Array.isArray(parsed.periodos) ? parsed.periodos : [],
-        custos: Object.assign({}, defaultState.custos, parsed.custos || {})
-      };
+    const s = localStorage.getItem(STORAGE_KEY);
+    if(s){ const p = JSON.parse(s);
+      return { periodos: Array.isArray(p.periodos)?p.periodos:[], custos: Object.assign({}, defaultState.custos, p.custos||{}) };
     }
-  }catch(e){ console.warn("Falha ao ler dados:", e); }
+  }catch(e){}
   return JSON.parse(JSON.stringify(defaultState));
 }
-function persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function custoExtraKm(c){ return num(c.depreciacao)+num(c.manutencao)+num(c.seguro)+num(c.outros); }
 
-/* ---------- helpers ---------- */
-function num(v){ const n = parseFloat(String(v).replace(',', '.')); return isNaN(n) ? 0 : n; }
-function brl(v){ return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
-function n1(v){ return (v||0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}); }
-function n2(v){ return (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function escapeHtml(s=""){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function fmtDate(iso){
-  if(!iso) return "—";
-  const [y,m,d] = iso.split('-');
-  return `${d}/${m}/${y}`;
-}
-function custoExtraKm(){
-  const c = state.custos;
-  return num(c.depreciacao)+num(c.manutencao)+num(c.seguro)+num(c.outros);
+function calcular(p, custos){
+  const km=num(p.km), consumo=num(p.consumo), preco=num(p.preco), faturamento=num(p.faturamento), horas=num(p.horas);
+  const litros = consumo>0 ? km/consumo : 0;
+  const gasto = litros*preco;
+  const saldo = faturamento - gasto;
+  const extras = custoExtraKm(custos)*km;
+  const liquido = saldo - extras;
+  return { km,consumo,preco,faturamento,horas,litros,gasto,saldo,extras,liquido,
+    rHora: horas>0?faturamento/horas:0, rHoraLiq: horas>0?liquido/horas:0,
+    rKm: km>0?faturamento/km:0, rKmLiq: km>0?liquido/km:0,
+    margem: faturamento>0?(saldo/faturamento)*100:0 };
 }
 
-/* ---------- calculo de um periodo ---------- */
-function calcular(p){
-  const km = num(p.km);
-  const consumo = num(p.consumo);
-  const preco = num(p.preco);
-  const faturamento = num(p.faturamento);
-  const horas = num(p.horas);
+/* ---------- icons ---------- */
+const I = {
+  grid: <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>,
+  plus: <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+  clock: <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>,
+  dots: <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>,
+  gear: <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+  download: <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+  car: <svg viewBox="0 0 24 24"><path d="M5 17h14M6 17l1.5-5A2 2 0 0 1 9.4 10.6h5.2a2 2 0 0 1 1.9 1.4L18 17"/><path d="M3 17h1m16 0h1"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></svg>,
+  wallet: <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12h3"/><path d="M3 9h13a2 2 0 0 1 2 2"/></svg>,
+  fuel: <svg viewBox="0 0 24 24"><rect x="4" y="4" width="9" height="16" rx="2"/><path d="M13 9h3a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3"/><line x1="4" y1="10" x2="13" y2="10"/></svg>,
+  trend: <svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>,
+  chev: <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>,
+  back: <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>,
+  chart: <svg viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M7 14l3-3 3 3 4-5"/></svg>,
+};
 
-  const litros = consumo > 0 ? km / consumo : 0;
-  const gastoCombustivel = litros * preco;
-  const saldo = faturamento - gastoCombustivel;
-
-  const custoKm = custoExtraKm();
-  const custosExtras = custoKm * km;
-  const liquido = saldo - custosExtras;
-
-  return {
-    km, consumo, preco, faturamento, horas,
-    litros, gastoCombustivel, saldo,
-    custosExtras, liquido,
-    rHora: horas > 0 ? faturamento / horas : 0,
-    rHoraLiquido: horas > 0 ? liquido / horas : 0,
-    rKm: km > 0 ? faturamento / km : 0,
-    rKmLiquido: km > 0 ? liquido / km : 0,
-    margem: faturamento > 0 ? (saldo / faturamento) * 100 : 0,
-    margemLiquida: faturamento > 0 ? (liquido / faturamento) * 100 : 0
-  };
-}
-
-/* ---------- navegacao ---------- */
-const TABS_PRINCIPAIS = ["dashboard","registrar","historico"];
-const TABS_MAIS = ["config","exportar"];
-
-function switchTab(tab){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  const sec = document.getElementById(tab);
-  if(sec) sec.classList.add("active");
-
-  // botoes da barra inferior
-  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.remove("active"));
-  const barBtn = document.querySelector(`.tabbar button[data-tab="${tab}"]`);
-  if(barBtn){
-    barBtn.classList.add("active");
-  }else if(TABS_MAIS.includes(tab)){
-    // aba secundaria: destaca o botao "Mais"
-    document.getElementById("moreBtn").classList.add("active");
+/* ---------- Smooth line chart ---------- */
+function LineChart({ data, fmt }){
+  const W=100, H=150, pad=10;
+  if(!data.length) return <div className="empty">{I.chart}<div>Sem dados ainda</div></div>;
+  const vals = data.map(d=>d.v);
+  const max = Math.max(...vals), min = Math.min(...vals, 0);
+  const range = (max-min)||1;
+  const n = data.length;
+  const X = i => n===1 ? W/2 : pad + (i/(n-1))*(W-2*pad);
+  const Y = v => (H-20) - ((v-min)/range)*(H-40);
+  const pts = data.map((d,i)=>[X(i),Y(d.v)]);
+  // catmull-rom -> bezier smoothing
+  let dPath = `M ${pts[0][0]} ${pts[0][1]}`;
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
+    const c1x=p1[0]+(p2[0]-p0[0])/6, c1y=p1[1]+(p2[1]-p0[1])/6;
+    const c2x=p2[0]-(p3[0]-p1[0])/6, c2y=p2[1]-(p3[1]-p1[1])/6;
+    dPath += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2[0]} ${p2[1]}`;
   }
-
-  // marca item do sheet ativo
-  document.querySelectorAll(".sheet-item").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
-
-  window.scrollTo({top:0,behavior:"smooth"});
+  const area = dPath + ` L ${pts[pts.length-1][0]} ${H} L ${pts[0][0]} ${H} Z`;
+  const last = pts[pts.length-1];
+  return (
+    <div>
+      <svg className="line" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.28"/>
+            <stop offset="100%" stopColor="var(--accent)" stopOpacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d={area} fill="url(#g1)" />
+        <path d={dPath} fill="none" stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>
+        <circle cx={last[0]} cy={last[1]} r="3.4" fill="var(--accent)" stroke="var(--bg)" strokeWidth="2" vectorEffect="non-scaling-stroke"/>
+      </svg>
+      <div className="xlabels">
+        {data.map((d,i)=>(i%Math.ceil(n/5||1)===0||i===n-1) ? <span key={i}>{d.label}</span> : null)}
+      </div>
+    </div>
+  );
 }
 
-// clique nos botoes da barra que tem data-tab
-document.querySelectorAll('.tabbar button[data-tab]').forEach(btn=>{
-  btn.addEventListener("click",()=>{ fecharMais(); switchTab(btn.dataset.tab); });
-});
-// clique nos itens do menu "Mais"
-document.querySelectorAll('.sheet-item[data-tab]').forEach(btn=>{
-  btn.addEventListener("click",()=>{ switchTab(btn.dataset.tab); fecharMais(); });
-});
-
-function abrirMais(){
-  document.getElementById("moreSheet").classList.add("open");
-  document.getElementById("sheetOverlay").classList.add("open");
-}
-function fecharMais(){
-  document.getElementById("moreSheet").classList.remove("open");
-  document.getElementById("sheetOverlay").classList.remove("open");
-}
-// fecha o menu com ESC
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") fecharMais(); });
-
-/* ---------- form ao vivo ---------- */
-["fFaturamento","fHoras","fKm","fConsumo","fPreco"].forEach(id=>{
-  document.getElementById(id).addEventListener("input", renderLive);
-});
-function lerForm(){
-  return {
-    data: document.getElementById("fData").value,
-    faturamento: document.getElementById("fFaturamento").value,
-    horas: document.getElementById("fHoras").value,
-    km: document.getElementById("fKm").value,
-    consumo: document.getElementById("fConsumo").value,
-    preco: document.getElementById("fPreco").value,
-    corridas: document.getElementById("fCorridas").value,
-    obs: document.getElementById("fObs").value
-  };
-}
-function renderLive(){
-  const c = calcular(lerForm());
-  const box = document.getElementById("liveResult");
-  if(c.faturamento === 0 && c.km === 0){
-    box.innerHTML = '<span class="muted small">Preencha os campos para ver o cálculo em tempo real.</span>';
-    return;
-  }
-  box.innerHTML = `
-    <b>Prévia do cálculo</b>
-    <div class="rl-grid">
-      <div class="split"><span>Gasto gasolina</span><b>${brl(c.gastoCombustivel)}</b></div>
-      <div class="split"><span>Saldo</span><b>${brl(c.saldo)}</b></div>
-      <div class="split"><span>Líquido estimado</span><b>${brl(c.liquido)}</b></div>
-      <div class="split"><span>R$/hora</span><b>${horasTxt(c.rHora)}</b></div>
-      <div class="split"><span>R$/km</span><b>${c.rKm?brl(c.rKm):'—'}</b></div>
-      <div class="split"><span>Litros usados</span><b>${n2(c.litros)} L</b></div>
-    </div>`;
-}
-function horasTxt(v){ return v ? brl(v)+'/h' : '—'; }
-
-function preencherExemplo(){
-  document.getElementById("fData").value = new Date().toISOString().slice(0,10);
-  document.getElementById("fFaturamento").value = "188.75";
-  document.getElementById("fHoras").value = "5.5";
-  document.getElementById("fKm").value = "86.9";
-  document.getElementById("fConsumo").value = "10";
-  document.getElementById("fPreco").value = "7";
-  document.getElementById("fCorridas").value = "";
-  document.getElementById("fObs").value = "";
-  renderLive();
-}
-function limparForm(){
-  ["fFaturamento","fHoras","fKm","fConsumo","fPreco","fCorridas","fObs"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("fData").value = new Date().toISOString().slice(0,10);
-  renderLive();
-}
-function cancelarEdicao(){
-  editId = null;
-  document.getElementById("formTitle").textContent = "Registrar período";
-  document.getElementById("cancelEditBtn").style.display = "none";
-  limparForm();
+/* ---------- Field ---------- */
+function Field({label, value, onChange, placeholder, pre, type="number", area}){
+  if(area) return (
+    <div className="field">
+      <label>{label}</label>
+      <textarea value={value} placeholder={placeholder} onChange={e=>onChange(e.target.value)} />
+    </div>
+  );
+  return (
+    <div className="field">
+      <label>{label}</label>
+      <div className="in">
+        {pre && <span className="pre">{pre}</span>}
+        <input type={type} inputMode={type==="number"?"decimal":undefined} step="0.01"
+          value={value} placeholder={placeholder} onChange={e=>onChange(e.target.value)} />
+      </div>
+    </div>
+  );
 }
 
-function salvarPeriodo(){
-  const f = lerForm();
-  if(num(f.faturamento) === 0 && num(f.km) === 0){
-    alert("Informe pelo menos o faturamento e/ou os km rodados.");
-    return;
-  }
-  if(!f.data) f.data = new Date().toISOString().slice(0,10);
-
-  if(editId){
-    const idx = state.periodos.findIndex(p=>p.id===editId);
-    if(idx>=0) state.periodos[idx] = Object.assign({}, state.periodos[idx], f);
-    editId = null;
-    document.getElementById("formTitle").textContent = "Registrar período";
-    document.getElementById("cancelEditBtn").style.display = "none";
-  }else{
-    f.id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-    state.periodos.push(f);
-  }
-  persist();
-  renderTudo();
-  limparForm();
-  switchTab("dashboard");
-}
-
-function editarPeriodo(id){
-  const p = state.periodos.find(x=>x.id===id);
-  if(!p) return;
-  editId = id;
-  document.getElementById("fData").value = p.data || "";
-  document.getElementById("fFaturamento").value = p.faturamento ?? "";
-  document.getElementById("fHoras").value = p.horas ?? "";
-  document.getElementById("fKm").value = p.km ?? "";
-  document.getElementById("fConsumo").value = p.consumo ?? "";
-  document.getElementById("fPreco").value = p.preco ?? "";
-  document.getElementById("fCorridas").value = p.corridas ?? "";
-  document.getElementById("fObs").value = p.obs ?? "";
-  document.getElementById("formTitle").textContent = "Editar período";
-  document.getElementById("cancelEditBtn").style.display = "";
-  renderLive();
-  switchTab("registrar");
-}
-
-function excluirPeriodo(id){
-  if(!confirm("Excluir este período?")) return;
-  state.periodos = state.periodos.filter(p=>p.id!==id);
-  persist();
-  renderTudo();
-}
-
-/* ---------- config ---------- */
-function carregarConfigInputs(){
-  document.getElementById("cDepreciacao").value = state.custos.depreciacao || "";
-  document.getElementById("cManutencao").value = state.custos.manutencao || "";
-  document.getElementById("cSeguro").value = state.custos.seguro || "";
-  document.getElementById("cOutros").value = state.custos.outros || "";
-  atualizarCustoTotal();
-}
-["cDepreciacao","cManutencao","cSeguro","cOutros"].forEach(id=>{
-  document.getElementById(id).addEventListener("input", atualizarCustoTotal);
-});
-function atualizarCustoTotal(){
-  const total = num(document.getElementById("cDepreciacao").value)
-    + num(document.getElementById("cManutencao").value)
-    + num(document.getElementById("cSeguro").value)
-    + num(document.getElementById("cOutros").value);
-  document.getElementById("custoTotalKm").textContent = brl(total) + " / km";
-}
-function salvarConfig(){
-  state.custos = {
-    depreciacao: num(document.getElementById("cDepreciacao").value),
-    manutencao: num(document.getElementById("cManutencao").value),
-    seguro: num(document.getElementById("cSeguro").value),
-    outros: num(document.getElementById("cOutros").value)
-  };
-  persist();
-  renderTudo();
-  alert("Custos salvos.");
-}
-
-/* ---------- render dashboard ---------- */
-function metric(label, value, cls=""){
-  return `<div class="metric ${cls}"><span class="muted small">${label}</span><b>${value}</b></div>`;
-}
-function periodosOrdenados(){
-  return [...state.periodos].sort((a,b)=>(a.data||"").localeCompare(b.data||"") || (a.id||"").localeCompare(b.id||""));
-}
-function renderDashboard(){
-  const ord = periodosOrdenados();
+/* ---------- Dashboard ---------- */
+function Dashboard({periodos, custos, go}){
+  const ord = useMemo(()=>[...periodos].sort((a,b)=>(a.data||"").localeCompare(b.data||"")||(a.id||"").localeCompare(b.id||"")), [periodos]);
+  const [modo,setModo] = useState("liquido"); // liquido | saldo | fat
+  const totais = ord.reduce((a,p)=>{ const c=calcular(p,custos); a.fat+=c.faturamento;a.saldo+=c.saldo;a.liq+=c.liquido;a.km+=c.km;a.horas+=c.horas;a.gas+=c.gasto; return a; },{fat:0,saldo:0,liq:0,km:0,horas:0,gas:0});
   const last = ord[ord.length-1];
+  const lc = last ? calcular(last,custos) : null;
 
-  // ultimo periodo
-  const lm = document.getElementById("lastMetrics");
-  const sub = document.getElementById("lastSubtitle");
-  if(!last){
-    lm.innerHTML = '<div class="empty" style="grid-column:1/-1">Nenhum período registrado ainda. Vá em <b>Registrar</b>.</div>';
-    sub.textContent = "";
-  }else{
-    const c = calcular(last);
-    lm.innerHTML =
-      metric("Faturamento", brl(c.faturamento)) +
-      metric("Saldo", brl(c.saldo), c.saldo>=0?"good":"bad") +
-      metric("Líquido estimado", brl(c.liquido), c.liquido>=0?"good":"bad") +
-      metric("R$/hora", c.rHora?brl(c.rHora):"—", "warn");
-    sub.innerHTML = `${fmtDate(last.data)} · ${n1(c.km)} km · ${n1(c.horas)} h · gasolina ${brl(c.gastoCombustivel)} (${n2(c.litros)} L)`;
-  }
+  const chartVal = p => { const c=calcular(p,custos); return modo==="fat"?c.faturamento:modo==="saldo"?c.saldo:c.liquido; };
+  const chartData = ord.slice(-8).map(p=>({v:chartVal(p), label:fmtShort(p.data)}));
+  const chartTotal = modo==="fat"?totais.fat:modo==="saldo"?totais.saldo:totais.liq;
+  const [ip,ic] = brlParts(lc?lc.liquido:0);
 
-  // totais
-  const tot = ord.reduce((a,p)=>{
-    const c = calcular(p);
-    a.fat+=c.faturamento; a.saldo+=c.saldo; a.liq+=c.liquido;
-    a.km+=c.km; a.horas+=c.horas; a.gas+=c.gastoCombustivel;
-    return a;
-  },{fat:0,saldo:0,liq:0,km:0,horas:0,gas:0});
+  if(!ord.length) return (
+    <div className="fadein">
+      <div className="empty" style={{marginTop:40}}>
+        {I.car}
+        <div style={{fontWeight:700,color:"var(--text)",marginBottom:6}}>Nenhum período ainda</div>
+        <div>Toque em <b style={{color:"var(--accent)"}}>Registrar</b> para adicionar seu primeiro período de corridas.</div>
+        <div style={{marginTop:18}}><button className="btn" style={{maxWidth:200,margin:"0 auto"}} onClick={()=>go("registrar")}>{I.plus} Registrar agora</button></div>
+      </div>
+    </div>
+  );
 
-  document.getElementById("totalMetrics").innerHTML =
-    metric("Períodos", String(ord.length)) +
-    metric("Faturamento total", brl(tot.fat)) +
-    metric("Saldo total", brl(tot.saldo), tot.saldo>=0?"good":"bad") +
-    metric("KM totais", n1(tot.km));
-
-  document.getElementById("netMetrics").innerHTML =
-    metric("Líquido total", brl(tot.liq), tot.liq>=0?"good":"bad") +
-    metric("R$/hora líquido", tot.horas?brl(tot.liq/tot.horas):"—","warn") +
-    metric("R$/km líquido", tot.km?brl(tot.liq/tot.km):"—") +
-    metric("Custo extra/km", brl(custoExtraKm()));
-
-  // graficos
-  renderBars("chartFaturamento", ord.slice(-12), p=>calcular(p).faturamento, brl);
-  renderBars("chartRh", ord.slice(-12), p=>calcular(p).rHora, v=>v?brl(v)+"/h":"—");
-
-  // badges
-  document.getElementById("badgeTotalPeriodos").textContent = `${ord.length} período${ord.length===1?"":"s"}`;
-  document.getElementById("badgeSaldoTotal").textContent = `Saldo total: ${brl(tot.saldo)}`;
-  document.getElementById("badgeRhMedio").textContent = `R$/h médio: ${tot.horas?brl(tot.fat/tot.horas):"—"}`;
-}
-
-function renderBars(containerId, items, valueFn, fmtFn){
-  const el = document.getElementById(containerId);
-  if(!items.length){ el.innerHTML = '<div class="empty">Sem dados ainda.</div>'; return; }
-  const vals = items.map(valueFn);
-  const max = Math.max(...vals, 0.0001);
-  el.innerHTML = items.map((p,i)=>{
-    const v = vals[i];
-    const pct = Math.max(2, (v/max)*100);
-    return `<div class="bar-row">
-      <span class="lbl">${fmtDate(p.data)}</span>
-      <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
-      <span class="val">${fmtFn(v)}</span>
-    </div>`;
-  }).join("");
-}
-
-/* ---------- render historico ---------- */
-function renderHistory(){
-  const el = document.getElementById("historyList");
-  const ord = periodosOrdenados().reverse();
-  if(!ord.length){
-    el.innerHTML = '<div class="empty">Nenhum período registrado. Vá em <b>Registrar</b> para começar.</div>';
-    return;
-  }
-  el.innerHTML = ord.map(p=>{
-    const c = calcular(p);
-    const corridas = num(p.corridas);
-    return `<div class="history-item">
-      <div class="history-head">
-        <div>
-          <b>${fmtDate(p.data)}</b>
-          <span class="muted small"> · ${n1(c.km)} km · ${n1(c.horas)} h${corridas?` · ${corridas} corridas`:""}</span>
-          ${p.obs?`<div class="muted small">${escapeHtml(p.obs)}</div>`:""}
-        </div>
-        <div class="actions" style="margin:0">
-          <button class="btn secondary small" onclick="editarPeriodo('${p.id}')">Editar</button>
-          <button class="btn danger small" onclick="excluirPeriodo('${p.id}')">Excluir</button>
+  return (
+    <div className="fadein">
+      <div className="balance">
+        <div className="lbl">Líquido do último período</div>
+        <div className="amt">{ip}<span className="cents">{ic}</span></div>
+        <div className="sub">
+          <span className={"tag "+(lc.liquido>=0?"up":"down")}>{lc.liquido>=0?"▲":"▼"} {n1(lc.margem)}% saldo</span>
+          {fmtDate(last.data)} · {n1(lc.km)} km · {n1(lc.horas)} h
         </div>
       </div>
-      <div class="history-metrics">
-        <div class="hi-cell"><span>Faturamento</span><b>${brl(c.faturamento)}</b></div>
-        <div class="hi-cell"><span>Gasolina</span><b>${brl(c.gastoCombustivel)}</b></div>
-        <div class="hi-cell"><span>Saldo</span><b>${brl(c.saldo)}</b></div>
-        <div class="hi-cell"><span>Líquido</span><b>${brl(c.liquido)}</b></div>
-        <div class="hi-cell"><span>R$/hora</span><b>${c.rHora?brl(c.rHora):"—"}</b></div>
-        <div class="hi-cell"><span>R$/km</span><b>${c.rKm?brl(c.rKm):"—"}</b></div>
-        <div class="hi-cell"><span>Consumo</span><b>${n1(c.consumo)} km/L</b></div>
-        <div class="hi-cell"><span>Margem</span><b>${n1(c.margem)}%</b></div>
+
+      <div className="seg" style={{marginTop:18}}>
+        {[["liquido","Líquido"],["saldo","Saldo"],["fat","Faturamento"]].map(([k,l])=>(
+          <button key={k} className={modo===k?"on":""} onClick={()=>setModo(k)}>{l}</button>
+        ))}
       </div>
-    </div>`;
-  }).join("");
+
+      <div className="card">
+        <div className="chart-head">
+          <div>
+            <div className="k">Total acumulado</div>
+            <div className="big">{brl(chartTotal)}</div>
+          </div>
+          <div className="k">{ord.length} período{ord.length>1?"s":""}</div>
+        </div>
+        <LineChart data={chartData} />
+      </div>
+
+      <div className="section-title"><h2>Resumo</h2></div>
+      <div className="stats2">
+        <div className="stat">
+          <div className="ic green">{I.wallet}</div>
+          <div className="v">{brl(totais.fat)}</div>
+          <div className="k">Faturamento total</div>
+        </div>
+        <div className="stat">
+          <div className="ic amber">{I.fuel}</div>
+          <div className="v">{brl(totais.gas)}</div>
+          <div className="k">Gasto com gasolina</div>
+        </div>
+        <div className="stat">
+          <div className="ic violet">{I.trend}</div>
+          <div className="v">{totais.horas?brl(totais.liq/totais.horas):"—"}</div>
+          <div className="k">R$/hora líquido</div>
+        </div>
+        <div className="stat">
+          <div className="ic blue">{I.car}</div>
+          <div className="v">{n1(totais.km)}</div>
+          <div className="k">KM totais</div>
+        </div>
+      </div>
+
+      <div className="card" style={{marginTop:14}}>
+        <h3>Ganho líquido estimado</h3>
+        <div className="mrow"><span className="k">Líquido total</span><span className={"v "+(totais.liq>=0?"good":"bad")}>{brl(totais.liq)}</span></div>
+        <div className="mrow"><span className="k">Saldo total (só combustível)</span><span className="v">{brl(totais.saldo)}</span></div>
+        <div className="mrow"><span className="k">Custo extra por km</span><span className="v">{brl(custoExtraKm(custos))}</span></div>
+        <div className="mrow"><span className="k">R$/km líquido</span><span className="v">{totais.km?brl(totais.liq/totais.km):"—"}</span></div>
+      </div>
+    </div>
+  );
 }
 
-/* ---------- exportar ---------- */
-function baixarArquivo(nome, conteudo, tipo){
-  const blob = new Blob([conteudo], {type:tipo});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = nome;
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
+/* ---------- Registrar ---------- */
+const emptyForm = () => ({data:todayISO(),faturamento:"",horas:"",km:"",consumo:"",preco:"",corridas:"",obs:""});
+function Registrar({custos, onSave, editing, onCancel}){
+  const [f,setF] = useState(editing || emptyForm());
+  useEffect(()=>{ setF(editing || emptyForm()); }, [editing]);
+  const set = (k,v)=>setF(s=>({...s,[k]:v}));
+  const c = calcular(f, custos);
+  const filled = num(f.faturamento)>0 || num(f.km)>0;
+
+  return (
+    <div className="fadein">
+      <div className="section-title"><h2>{editing?"Editar período":"Novo período"}</h2>
+        {editing && <button className="link" onClick={onCancel}>Cancelar</button>}
+      </div>
+      <div className="card">
+        <div className="field">
+          <label>Data</label>
+          <div className="in"><input type="date" value={f.data} onChange={e=>set("data",e.target.value)} /></div>
+        </div>
+        <Field label="Faturamento" pre="R$" value={f.faturamento} onChange={v=>set("faturamento",v)} placeholder="188,75" />
+        <div className="grid2">
+          <Field label="Horas" value={f.horas} onChange={v=>set("horas",v)} placeholder="5,5" />
+          <Field label="KM rodados" value={f.km} onChange={v=>set("km",v)} placeholder="86,9" />
+        </div>
+        <div className="grid2">
+          <Field label="Consumo (km/L)" value={f.consumo} onChange={v=>set("consumo",v)} placeholder="10,0" />
+          <Field label="Combustível (R$/L)" pre="R$" value={f.preco} onChange={v=>set("preco",v)} placeholder="7,00" />
+        </div>
+        <Field label="Corridas (opcional)" value={f.corridas} onChange={v=>set("corridas",v)} placeholder="12" />
+        <Field label="Observações (opcional)" area value={f.obs} onChange={v=>set("obs",v)} placeholder="Chuva, região, plataforma..." />
+      </div>
+
+      {filled && (
+        <div className="card" style={{marginTop:14}}>
+          <h3>Prévia</h3>
+          <div className="mrow"><span className="k">Gasto gasolina</span><span className="v">{brl(c.gasto)} · {n2(c.litros)} L</span></div>
+          <div className="mrow"><span className="k">Saldo</span><span className={"v "+(c.saldo>=0?"good":"bad")}>{brl(c.saldo)}</span></div>
+          <div className="mrow"><span className="k">Líquido estimado</span><span className={"v "+(c.liquido>=0?"good":"bad")}>{brl(c.liquido)}</span></div>
+          <div className="mrow"><span className="k">R$/hora · R$/km</span><span className="v">{c.rHora?brl(c.rHora):"—"} · {c.rKm?brl(c.rKm):"—"}</span></div>
+        </div>
+      )}
+
+      <div className="btnrow">
+        <button className="btn" onClick={()=>onSave(f)}>{I.plus} {editing?"Salvar alterações":"Salvar período"}</button>
+      </div>
+      {!editing && <div className="btnrow"><button className="btn ghost sm" onClick={()=>setF({...emptyForm(),faturamento:"188.75",horas:"5.5",km:"86.9",consumo:"10",preco:"7"})}>Preencher exemplo</button></div>}
+    </div>
+  );
 }
-function exportarJSON(){
-  baixarArquivo(`ganhos-corridas-backup-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(state,null,2), "application/json");
+
+/* ---------- Historico ---------- */
+function Historico({periodos, custos, onEdit, onDelete}){
+  const ord = useMemo(()=>[...periodos].sort((a,b)=>(b.data||"").localeCompare(a.data||"")||(b.id||"").localeCompare(a.id||"")), [periodos]);
+  if(!ord.length) return <div className="empty" style={{marginTop:40}}>{I.clock}<div>Nenhum período registrado.</div></div>;
+  return (
+    <div className="fadein">
+      <div className="section-title"><h2>Histórico</h2><span className="link">{ord.length} registros</span></div>
+      <div className="card">
+        {ord.map(p=>{
+          const c = calcular(p,custos);
+          return (
+            <div className="hist" key={p.id} onClick={()=>onEdit(p)}>
+              <div className="av">{I.car}</div>
+              <div className="mid">
+                <div className="t">{fmtDate(p.data)}</div>
+                <div className="s">{n1(c.km)} km · {n1(c.horas)} h · gasolina {brl(c.gasto)}{num(p.corridas)?` · ${num(p.corridas)} corridas`:""}</div>
+              </div>
+              <div className="amt" style={{color:c.liquido>=0?"var(--accent)":"var(--red)"}}>
+                {brl(c.liquido)}
+                <small>{c.rHora?brl(c.rHora)+"/h":""}</small>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="empty" style={{padding:"14px",fontSize:".78rem"}}>Toque em um período para editar ou excluir.</div>
+    </div>
+  );
 }
-function importarJSON(ev){
-  const file = ev.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e=>{
-    try{
-      const data = JSON.parse(e.target.result);
-      if(!data || !Array.isArray(data.periodos)) throw new Error("Formato inválido");
-      if(!confirm("Isto vai substituir os dados atuais. Continuar?")) return;
-      state = { periodos:data.periodos, custos:Object.assign({}, defaultState.custos, data.custos||{}) };
-      persist(); carregarConfigInputs(); renderTudo();
-      alert("Backup importado com sucesso.");
-    }catch(err){ alert("Não foi possível importar: "+err.message); }
-    ev.target.value = "";
+
+/* ---------- Custos ---------- */
+function Custos({custos, onSave}){
+  const [c,setC] = useState(custos);
+  useEffect(()=>setC(custos),[custos]);
+  const set=(k,v)=>setC(s=>({...s,[k]:v}));
+  const total = custoExtraKm(c);
+  return (
+    <div className="fadein">
+      <div className="section-title"><h2>Custos por km</h2></div>
+      <div className="card">
+        <p style={{margin:"0 0 16px",color:"var(--muted)",fontSize:".88rem"}}>Além do combustível, informe quanto gasta por km. Isso é descontado para estimar o ganho líquido. Deixe zero se não quiser considerar.</p>
+        <div className="grid2">
+          <Field label="Depreciação (R$/km)" pre="R$" value={c.depreciacao} onChange={v=>set("depreciacao",v)} placeholder="0,15" />
+          <Field label="Manutenção (R$/km)" pre="R$" value={c.manutencao} onChange={v=>set("manutencao",v)} placeholder="0,10" />
+        </div>
+        <div className="grid2">
+          <Field label="Seguro (R$/km)" pre="R$" value={c.seguro} onChange={v=>set("seguro",v)} placeholder="0,05" />
+          <Field label="Outros (R$/km)" pre="R$" value={c.outros} onChange={v=>set("outros",v)} placeholder="0,00" />
+        </div>
+        <div className="mrow" style={{borderTop:"1px solid var(--line)",marginTop:6}}><span className="k">Total de custos extras</span><span className="v good">{brl(total)} / km</span></div>
+      </div>
+      <div className="btnrow"><button className="btn" onClick={()=>onSave(c)}>Salvar custos</button></div>
+    </div>
+  );
+}
+
+/* ---------- Exportar ---------- */
+function baixar(nome,conteudo,tipo){
+  const blob=new Blob([conteudo],{type:tipo}); const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=nome; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+function Exportar({state, custos, onImport, onWipe}){
+  const fileRef = useRef();
+  const exportJSON = ()=>baixar(`ganhos-corridas-backup-${todayISO()}.json`, JSON.stringify(state,null,2), "application/json");
+  const exportMD = ()=>{
+    const ord=[...state.periodos].sort((a,b)=>(a.data||"").localeCompare(b.data||""));
+    let md=`# Ganhos de corridas — Juarez\n\nGerado em ${new Date().toLocaleString('pt-BR')}\n\n`;
+    md+=`| Data | Fat. | Gasolina | Saldo | Líquido | R$/h | KM | Horas |\n|---|---|---|---|---|---|---|---|\n`;
+    const t={fat:0,gas:0,saldo:0,liq:0,km:0,horas:0};
+    ord.forEach(p=>{const c=calcular(p,custos);t.fat+=c.faturamento;t.gas+=c.gasto;t.saldo+=c.saldo;t.liq+=c.liquido;t.km+=c.km;t.horas+=c.horas;
+      md+=`| ${fmtDate(p.data)} | ${brl(c.faturamento)} | ${brl(c.gasto)} | ${brl(c.saldo)} | ${brl(c.liquido)} | ${c.rHora?brl(c.rHora):"—"} | ${n1(c.km)} | ${n1(c.horas)} |\n`;});
+    md+=`| **Total** | **${brl(t.fat)}** | **${brl(t.gas)}** | **${brl(t.saldo)}** | **${brl(t.liq)}** | **${t.horas?brl(t.fat/t.horas):"—"}** | **${n1(t.km)}** | **${n1(t.horas)}** |\n`;
+    baixar(`ganhos-corridas-${todayISO()}.md`, md, "text/markdown");
   };
-  reader.readAsText(file);
-}
-function exportarMarkdown(){
-  const ord = periodosOrdenados();
-  let md = `# Ganhos de corridas — Juarez\n\nGerado em ${new Date().toLocaleString('pt-BR')}\n\n`;
-  md += `Custos extras: ${brl(custoExtraKm())}/km (depreciação ${brl(num(state.custos.depreciacao))}, manutenção ${brl(num(state.custos.manutencao))}, seguro ${brl(num(state.custos.seguro))}, outros ${brl(num(state.custos.outros))}).\n\n`;
-  md += `| Data | Fat. | Gasolina | Saldo | Líquido | R$/h | R$/km | KM | Horas |\n`;
-  md += `|---|---|---|---|---|---|---|---|---|\n`;
-  const tot = {fat:0,gas:0,saldo:0,liq:0,km:0,horas:0};
-  ord.forEach(p=>{
-    const c = calcular(p);
-    tot.fat+=c.faturamento; tot.gas+=c.gastoCombustivel; tot.saldo+=c.saldo; tot.liq+=c.liquido; tot.km+=c.km; tot.horas+=c.horas;
-    md += `| ${fmtDate(p.data)} | ${brl(c.faturamento)} | ${brl(c.gastoCombustivel)} | ${brl(c.saldo)} | ${brl(c.liquido)} | ${c.rHora?brl(c.rHora):"—"} | ${c.rKm?brl(c.rKm):"—"} | ${n1(c.km)} | ${n1(c.horas)} |\n`;
-  });
-  md += `| **Total** | **${brl(tot.fat)}** | **${brl(tot.gas)}** | **${brl(tot.saldo)}** | **${brl(tot.liq)}** | **${tot.horas?brl(tot.fat/tot.horas):"—"}** | **${tot.km?brl(tot.fat/tot.km):"—"}** | **${n1(tot.km)}** | **${n1(tot.horas)}** |\n`;
-  baixarArquivo(`ganhos-corridas-${new Date().toISOString().slice(0,10)}.md`, md, "text/markdown");
-}
-function apagarTudo(){
-  if(!confirm("Tem certeza? Isto apaga TODOS os períodos e custos deste dispositivo.")) return;
-  if(!confirm("Última confirmação: apagar tudo mesmo?")) return;
-  state = JSON.parse(JSON.stringify(defaultState));
-  persist(); carregarConfigInputs(); renderTudo();
+  const doImport = e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const r=new FileReader();
+    r.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); if(!d||!Array.isArray(d.periodos)) throw 0;
+      if(confirm("Isto substitui os dados atuais. Continuar?")) onImport(d);
+    }catch(err){ alert("Arquivo inválido."); } e.target.value=""; };
+    r.readAsText(file);
+  };
+  return (
+    <div className="fadein">
+      <div className="section-title"><h2>Backup e exportar</h2></div>
+      <div className="card">
+        <p style={{margin:"0 0 16px",color:"var(--muted)",fontSize:".88rem"}}>Seus dados ficam só neste dispositivo. Faça backup para não perder.</p>
+        <div className="btnrow" style={{marginTop:0,flexDirection:"column"}}>
+          <button className="btn" onClick={exportJSON}>{I.download} Exportar backup (JSON)</button>
+          <button className="btn ghost" onClick={()=>fileRef.current.click()}>Importar backup</button>
+          <button className="btn ghost" onClick={exportMD}>Exportar relatório (Markdown)</button>
+          <input ref={fileRef} type="file" accept="application/json" style={{display:"none"}} onChange={doImport} />
+        </div>
+      </div>
+      <div className="card" style={{marginTop:14}}>
+        <h3>Zona de risco</h3>
+        <button className="btn danger" onClick={onWipe}>Apagar todos os dados</button>
+      </div>
+    </div>
+  );
 }
 
-/* ---------- boot ---------- */
-function renderTudo(){ renderDashboard(); renderHistory(); }
-document.getElementById("fData").value = new Date().toISOString().slice(0,10);
-carregarConfigInputs();
-renderLive();
-renderTudo();
+/* ---------- App ---------- */
+function App(){
+  const [state,setState] = useState(loadState);
+  const [tab,setTab] = useState("dashboard");
+  const [sheet,setSheet] = useState(false);
+  const [editing,setEditing] = useState(null);
+  const [toast,setToast] = useState("");
+  const toastTimer = useRef();
 
-/* service worker */
-if("serviceWorker" in navigator && location.protocol.startsWith("http")){
-  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  useEffect(()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }, [state]);
+
+  const notify = m => { setToast(m); clearTimeout(toastTimer.current); toastTimer.current=setTimeout(()=>setToast(""),1900); };
+  const go = t => { setTab(t); setSheet(false); window.scrollTo({top:0,behavior:"smooth"}); };
+
+  const savePeriodo = f => {
+    if(num(f.faturamento)===0 && num(f.km)===0){ notify("Informe faturamento e/ou km"); return; }
+    const data = f.data || todayISO();
+    if(f.id){ setState(s=>({...s, periodos:s.periodos.map(p=>p.id===f.id?{...f,data}:p)})); notify("Período atualizado"); }
+    else { setState(s=>({...s, periodos:[...s.periodos, {...f,data,id:uid()}]})); notify("Período salvo"); }
+    setEditing(null); go("dashboard");
+  };
+  const editPeriodo = p => { setEditing(p); go("registrar"); };
+  const deletePeriodo = id => { if(confirm("Excluir este período?")){ setState(s=>({...s,periodos:s.periodos.filter(p=>p.id!==id)})); notify("Excluído"); } };
+  const saveCustos = c => { setState(s=>({...s,custos:{depreciacao:num(c.depreciacao),manutencao:num(c.manutencao),seguro:num(c.seguro),outros:num(c.outros)}})); notify("Custos salvos"); go("dashboard"); };
+  const importData = d => { setState({periodos:d.periodos, custos:Object.assign({},defaultState.custos,d.custos||{})}); notify("Backup importado"); go("dashboard"); };
+  const wipe = () => { if(confirm("Apagar TODOS os dados deste dispositivo?") && confirm("Confirmar? Isso não pode ser desfeito.")){ setState(JSON.parse(JSON.stringify(defaultState))); notify("Tudo apagado"); go("dashboard"); } };
+
+  const isMais = tab==="config" || tab==="exportar";
+
+  return (
+    <div className="wrap">
+      <div className="top">
+        <div>
+          <div className="hello">Olá, Juarez</div>
+          <div className="title">{tab==="dashboard"?"Meus ganhos":tab==="registrar"?"Registrar":tab==="historico"?"Histórico":tab==="config"?"Custos":"Exportar"}</div>
+        </div>
+        <button className="iconbtn" onClick={()=>go("config")} aria-label="Custos">{I.gear}</button>
+      </div>
+
+      {tab==="dashboard" && <Dashboard periodos={state.periodos} custos={state.custos} go={go} />}
+      {tab==="registrar" && <Registrar custos={state.custos} onSave={savePeriodo} editing={editing} onCancel={()=>{setEditing(null);}} />}
+      {tab==="historico" && <Historico periodos={state.periodos} custos={state.custos} onEdit={editPeriodo} onDelete={deletePeriodo} />}
+      {tab==="config" && <Custos custos={state.custos} onSave={saveCustos} />}
+      {tab==="exportar" && <Exportar state={state} custos={state.custos} onImport={importData} onWipe={wipe} />}
+
+      {tab==="registrar" && editing && (
+        <div className="btnrow"><button className="btn danger" onClick={()=>{deletePeriodo(editing.id); setEditing(null); go("historico");}}>Excluir este período</button></div>
+      )}
+
+      {/* overlay + sheet */}
+      <div className={"ov"+(sheet?" open":"")} onClick={()=>setSheet(false)}></div>
+      <div className={"sheet"+(sheet?" open":"")}>
+        <div className="grab"></div>
+        <button className={"sheet-item"+(tab==="config"?" on":"")} onClick={()=>go("config")}>
+          <span className="si">{I.gear}</span> Custos por km <span className="chev">{I.chev}</span>
+        </button>
+        <button className={"sheet-item"+(tab==="exportar"?" on":"")} onClick={()=>go("exportar")}>
+          <span className="si">{I.download}</span> Backup e exportar <span className="chev">{I.chev}</span>
+        </button>
+      </div>
+
+      {/* tabbar */}
+      <nav className="tabbar">
+        <button className={tab==="dashboard"?"on":""} onClick={()=>go("dashboard")}>{I.grid}<span className="lab">Painel</span></button>
+        <button className={tab==="registrar"?"on":""} onClick={()=>{setEditing(null);go("registrar");}}>{I.plus}<span className="lab">Registrar</span></button>
+        <button className={tab==="historico"?"on":""} onClick={()=>go("historico")}>{I.clock}<span className="lab">Histórico</span></button>
+        <button className={isMais?"on":""} onClick={()=>setSheet(v=>!v)}>{I.dots}<span className="lab">Mais</span></button>
+      </nav>
+
+      <div className={"toast"+(toast?" show":"")}>{toast}</div>
+    </div>
+  );
 }
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
