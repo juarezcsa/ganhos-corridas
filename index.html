@@ -239,19 +239,55 @@ const ym = iso => (iso||"").slice(0,7);
 
 /* ---------- estado / retrocompat ---------- */
 const defaultCustos = { depreciacao:0, manutencao:0, seguro:0, outros:0, seguroModo:"km", seguroMensal:0, kmMes:0 };
-const defaultState = { periodos:[], custos:{...defaultCustos}, despesas:[] };
+/* veiculo: tipo de energia define unidades; depreciacaoAuto usa valor+desvalorizacao */
+const defaultVeiculo = {
+  tipoEnergia:"combustao",       // combustao | eletrico | hibrido
+  valor:0,                        // valor atual do carro (R$)
+  desvalorizaAno:15,              // % ao ano
+  depModo:"auto",                 // auto (pelo valor) | manual (R$/km em custos.depreciacao)
+  consumo:0,                      // km/L ou km/kWh
+  preco:0                         // R$/L ou R$/kWh
+};
+/* gestao: como dividir o que sobra depois dos custos (percentuais) */
+const defaultGestao = {
+  ativo:true,
+  base:"bruto",                   // bruto | sobra  (principal = bruto)
+  manutencao:10, emergencia:10, impostos:5, prolabore:60, lucro:15
+};
+const defaultState = { periodos:[], custos:{...defaultCustos}, despesas:[], veiculo:{...defaultVeiculo}, gestao:{...defaultGestao} };
 function loadState(){
   try{
     const s = localStorage.getItem(STORAGE_KEY);
     if(s){ const p = JSON.parse(s);
+      const veiculo = Object.assign({}, defaultVeiculo, p.veiculo||{});
+      // migracao: se nao ha perfil de veiculo mas ha periodos antigos, herda consumo/preco do ultimo periodo
+      if(!p.veiculo && Array.isArray(p.periodos) && p.periodos.length){
+        const ult = [...p.periodos].reverse().find(x=>num(x.consumo)>0||num(x.preco)>0);
+        if(ult){ if(!veiculo.consumo) veiculo.consumo=num(ult.consumo); if(!veiculo.preco) veiculo.preco=num(ult.preco); }
+      }
       return {
         periodos: Array.isArray(p.periodos)?p.periodos:[],
         custos: Object.assign({}, defaultCustos, p.custos||{}),
-        despesas: Array.isArray(p.despesas)?p.despesas:[]
+        despesas: Array.isArray(p.despesas)?p.despesas:[],
+        veiculo,
+        gestao: Object.assign({}, defaultGestao, p.gestao||{})
       };
     }
   }catch(e){}
   return JSON.parse(JSON.stringify(defaultState));
+}
+
+/* rotulos de unidade conforme energia */
+function unidades(tipo){
+  if(tipo==="eletrico") return { dist:"km/kWh", preco:"R$/kWh", energia:"kWh", energiaNome:"energia" };
+  return { dist:"km/L", preco:"R$/L", energia:"L", energiaNome:"combustível" };
+}
+
+/* depreciacao em R$/km calculada pelo valor do carro */
+function depreciacaoAuto(veiculo, kmMesRef){
+  const kmAno = kmMesRef*12;
+  if(kmAno<=0 || num(veiculo.valor)<=0) return 0;
+  return (num(veiculo.valor)*(num(veiculo.desvalorizaAno)/100))/kmAno;
 }
 
 /* km/mês estimado pelo histórico (média mensal), usado quando kmMes não é informado */
@@ -305,10 +341,16 @@ function seguroPorKm(custos, kmMesRef){
   return num(custos.seguro);
 }
 
+/* depreciacao efetiva (auto pelo valor ou manual em R$/km) */
+function depEfetiva(veiculo, custos, kmMesRef){
+  if(veiculo && veiculo.depModo==="auto") return depreciacaoAuto(veiculo, kmMesRef);
+  return num(custos.depreciacao);
+}
+
 /* custo total por km, considerando tudo */
-function custoExtraKm(custos, despesas, periodos){
+function custoExtraKm(custos, despesas, periodos, veiculo){
   const kmMesRef = num(custos.kmMes) > 0 ? num(custos.kmMes) : kmMesEstimado(periodos);
-  const dep = num(custos.depreciacao);
+  const dep = depEfetiva(veiculo, custos, kmMesRef);
   const man = num(custos.manutencao);
   const out = num(custos.outros);
   const seg = seguroPorKm(custos, kmMesRef);
@@ -316,23 +358,27 @@ function custoExtraKm(custos, despesas, periodos){
   return dep + man + out + seg + desp;
 }
 /* detalhamento para exibição */
-function custoBreakdown(custos, despesas, periodos){
+function custoBreakdown(custos, despesas, periodos, veiculo){
   const kmMesRef = num(custos.kmMes) > 0 ? num(custos.kmMes) : kmMesEstimado(periodos);
   const desp = despesasPorKm(despesas, kmMesRef);
+  const dep = depEfetiva(veiculo, custos, kmMesRef);
   return {
     kmMesRef,
-    depreciacao: num(custos.depreciacao),
+    depreciacao: dep,
     manutencao: num(custos.manutencao),
     outros: num(custos.outros),
     seguro: seguroPorKm(custos, kmMesRef),
     despVida: desp.vidaUtil,
     despCorrente: desp.corrente,
-    total: num(custos.depreciacao)+num(custos.manutencao)+num(custos.outros)+seguroPorKm(custos,kmMesRef)+desp.total
+    total: dep+num(custos.manutencao)+num(custos.outros)+seguroPorKm(custos,kmMesRef)+desp.total
   };
 }
 
-function calcular(p, custoKm){
-  const km=num(p.km), consumo=num(p.consumo), preco=num(p.preco), faturamento=num(p.faturamento), horas=num(p.horas);
+/* calcular um periodo. veiculo fornece consumo/preco padrao quando o periodo nao tem */
+function calcular(p, custoKm, veiculo){
+  const km=num(p.km), faturamento=num(p.faturamento), horas=num(p.horas);
+  const consumo = num(p.consumo) || (veiculo?num(veiculo.consumo):0);
+  const preco = num(p.preco) || (veiculo?num(veiculo.preco):0);
   const litros = consumo>0 ? km/consumo : 0;
   const gasto = litros*preco;
   const saldo = faturamento - gasto;
@@ -342,6 +388,20 @@ function calcular(p, custoKm){
     rHora: horas>0?faturamento/horas:0, rHoraLiq: horas>0?liquido/horas:0,
     rKm: km>0?faturamento/km:0, rKmLiq: km>0?liquido/km:0,
     margem: faturamento>0?(saldo/faturamento)*100:0 };
+}
+
+/* reparte um valor (o que sobra ou o bruto) nos envelopes de gestao */
+function repartir(valorBase, gestao){
+  const g = gestao||defaultGestao;
+  const pct = k => Math.max(0, num(g[k]))/100;
+  return {
+    manutencao: valorBase*pct("manutencao"),
+    emergencia: valorBase*pct("emergencia"),
+    impostos: valorBase*pct("impostos"),
+    prolabore: valorBase*pct("prolabore"),
+    lucro: valorBase*pct("lucro"),
+    somaPct: num(g.manutencao)+num(g.emergencia)+num(g.impostos)+num(g.prolabore)+num(g.lucro)
+  };
 }
 
 /* níveis de depreciação sugeridos (base: carro popular ~R$80mil, ~30 mil km/ano) */
@@ -371,6 +431,9 @@ const I = {
   trash: <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>,
   shield: <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>,
   tools: <svg viewBox="0 0 24 24"><path d="M14 7a4 4 0 0 1 5 5l-9 9-3-3 9-9a4 4 0 0 1-2-2z"/><path d="M6 21l-3-3"/></svg>,
+  pig: <svg viewBox="0 0 24 24"><path d="M19 10c1 0 2 1 2 2s-1 2-2 2v2a2 2 0 0 1-2 2h-1v-1a1 1 0 0 0-2 0v1H9v-1a1 1 0 0 0-2 0v1H6a3 3 0 0 1-3-3 5 5 0 0 1 5-5h4a5 5 0 0 1 4-2 3 3 0 0 1 3 3z"/><circle cx="16" cy="12" r=".6"/><path d="M9 8a2 2 0 0 1 4 0"/></svg>,
+  bolt: <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+  target: <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>,
 };
 
 /* ---------- Tooltip ---------- */
@@ -467,18 +530,23 @@ function Timer({onApply, onInfo}){
 
 /* ---------- Registrar ---------- */
 const emptyForm = () => ({data:todayISO(),faturamento:"",horas:"",km:"",kmIni:"",kmFim:"",consumo:"",preco:"",corridas:"",obs:""});
-function Registrar({custoKm, onSave, editing, onCancel, onInfo}){
+function Registrar({custoKm, veiculo, onSave, editing, onCancel, onInfo, go}){
   const [f,setF] = useState(editing || emptyForm());
   const [horasModo,setHorasModo] = useState("manual"); // manual | timer
   const [kmModo,setKmModo] = useState(editing && (editing.kmIni||editing.kmFim) ? "intervalo" : "direto");
+  const [energiaAberto,setEnergiaAberto] = useState(false);
   useEffect(()=>{ setF(editing || emptyForm()); setKmModo(editing && (editing.kmIni||editing.kmFim) ? "intervalo":"direto"); }, [editing]);
   const set = (k,v)=>setF(s=>({...s,[k]:v}));
+  const u = unidades(veiculo?veiculo.tipoEnergia:"combustao");
+  const consumoPerfil = veiculo?num(veiculo.consumo):0;
+  const precoPerfil = veiculo?num(veiculo.preco):0;
+  const temPerfil = consumoPerfil>0 && precoPerfil>0;
 
   // km derivado do intervalo
   const kmIntervalo = Math.max(0, num(f.kmFim)-num(f.kmIni));
   const kmEfetivo = kmModo==="intervalo" ? kmIntervalo : num(f.km);
   const formCalc = {...f, km:kmEfetivo};
-  const c = calcular(formCalc, custoKm);
+  const c = calcular(formCalc, custoKm, veiculo);
   const filled = num(f.faturamento)>0 || kmEfetivo>0;
 
   const doSave = ()=>{
@@ -528,10 +596,25 @@ function Registrar({custoKm, onSave, editing, onCancel, onInfo}){
               <div className="hintbox">Rodado no período: <b>{n1(kmIntervalo)} km</b></div>
             </div>)}
 
-        <div className="grid2" style={{marginTop:14}}>
-          <Field label="Consumo" suf="km/L" info="consumo" onInfo={onInfo} value={f.consumo} onChange={v=>set("consumo",v)} placeholder="10,0" />
-          <Field label="Combustível" pre="R$" suf="/L" info="preco" onInfo={onInfo} value={f.preco} onChange={v=>set("preco",v)} placeholder="7,00" />
+        {/* ENERGIA: usa o perfil do veículo; permite ajustar só neste período */}
+        <div style={{marginTop:14}}>
+          {temPerfil && !energiaAberto ? (
+            <div className="hintbox" style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+              <span>{u.energiaNome[0].toUpperCase()+u.energiaNome.slice(1)}: <b>{n1(consumoPerfil)} {u.dist}</b> · <b>{brl(precoPerfil)}/{u.energia}</b> <span style={{color:"var(--faint)"}}>(do seu veículo)</span></span>
+              <button className="link" onClick={()=>setEnergiaAberto(true)}>Ajustar</button>
+            </div>
+          ) : (
+            <div>
+              {!temPerfil && <div className="hintbox" style={{marginBottom:10}}>Dica: configure seu veículo em <b onClick={()=>go&&go("veiculo")} style={{color:"var(--accent)",cursor:"pointer"}}>Meu veículo</b> para não digitar isto toda vez.</div>}
+              <div className="grid2">
+                <Field label={"Consumo ("+u.dist+")"} info="consumo" onInfo={onInfo} value={f.consumo} onChange={v=>set("consumo",v)} placeholder={temPerfil?String(n1(consumoPerfil)):"10,0"} />
+                <Field label={u.energiaNome[0].toUpperCase()+u.energiaNome.slice(1)} pre="R$" suf={"/"+u.energia} info="preco" onInfo={onInfo} value={f.preco} onChange={v=>set("preco",v)} placeholder={temPerfil?String(n2(precoPerfil)):"7,00"} />
+              </div>
+              {temPerfil && <div className="hintbox">Deixe vazio para usar os valores do seu veículo. Preencher aqui vale só para este período.</div>}
+            </div>
+          )}
         </div>
+
         <Field label="Corridas (opcional)" value={f.corridas} onChange={v=>set("corridas",v)} placeholder="12" />
         <Field label="Observações (opcional)" area value={f.obs} onChange={v=>set("obs",v)} placeholder="Chuva, região, plataforma..." />
       </div>
@@ -539,8 +622,8 @@ function Registrar({custoKm, onSave, editing, onCancel, onInfo}){
       {filled && (
         <div className="card" style={{marginTop:14}}>
           <h3>Prévia</h3>
-          <div className="mrow"><span className="k">Gasto gasolina</span><span className="v">{brl(c.gasto)} · {n2(c.litros)} L</span></div>
-          <div className="mrow"><span className="k">Saldo (fat. − gasolina)</span><span className={"v "+(c.saldo>=0?"good":"bad")}>{brl(c.saldo)}</span></div>
+          <div className="mrow"><span className="k">Gasto com {u.energiaNome}</span><span className="v">{brl(c.gasto)} · {n2(c.litros)} {u.energia}</span></div>
+          <div className="mrow"><span className="k">Saldo (fat. − {u.energiaNome})</span><span className={"v "+(c.saldo>=0?"good":"bad")}>{brl(c.saldo)}</span></div>
           <div className="mrow"><span className="k">Outros custos ({brl3(custoKm)}/km)</span><span className="v">−{brl(c.extras)}</span></div>
           <div className="mrow total"><span className="k">Líquido estimado</span><span className={"v "+(c.liquido>=0?"good":"bad")}>{brl(c.liquido)}</span></div>
           <div className="mrow"><span className="k">R$/hora · R$/km</span><span className="v">{c.rHora?brl(c.rHora):"—"} · {c.rKm?brl(c.rKm):"—"}</span></div>
@@ -548,13 +631,13 @@ function Registrar({custoKm, onSave, editing, onCancel, onInfo}){
       )}
 
       <div className="btnrow"><button className="btn" onClick={doSave}>{I.plus} {editing?"Salvar alterações":"Salvar período"}</button></div>
-      {!editing && <div className="btnrow"><button className="btn ghost sm" onClick={()=>{ setKmModo("direto"); setF({...emptyForm(),faturamento:"188.75",horas:"5.5",km:"86.9",consumo:"10",preco:"7"}); }}>Preencher exemplo</button></div>}
+      {!editing && <div className="btnrow"><button className="btn ghost sm" onClick={()=>{ setKmModo("direto"); setF({...emptyForm(),faturamento:"188.75",horas:"5.5",km:"86.9"}); }}>Preencher exemplo</button></div>}
     </div>
   );
 }
 
 /* ---------- Historico ---------- */
-function Historico({periodos, custoKm, onEdit}){
+function Historico({periodos, custoKm, veiculo, onEdit}){
   const ord = useMemo(()=>[...periodos].sort((a,b)=>(b.data||"").localeCompare(a.data||"")||(b.id||"").localeCompare(a.id||"")), [periodos]);
   if(!ord.length) return <div className="empty" style={{marginTop:40}}>{I.clock}<div>Nenhum período registrado.</div></div>;
   return (
@@ -562,7 +645,7 @@ function Historico({periodos, custoKm, onEdit}){
       <div className="section-title"><h2>Histórico</h2><span className="link">{ord.length} registros</span></div>
       <div className="card">
         {ord.map(p=>{
-          const c = calcular(p,custoKm);
+          const c = calcular(p,custoKm,veiculo);
           return (
             <div className="hist" key={p.id} onClick={()=>onEdit(p)}>
               <div className="av">{I.car}</div>
@@ -583,14 +666,10 @@ function Historico({periodos, custoKm, onEdit}){
 }
 
 /* ---------- Custos ---------- */
-function Custos({custos, despesas, periodos, onSaveCustos, onAddDespesa, onDelDespesa, onInfo}){
+function Custos({custos, despesas, periodos, veiculo, onSaveCustos, onAddDespesa, onDelDespesa, onInfo}){
   const [c,setC] = useState(custos);
   useEffect(()=>setC(custos),[custos]);
   const set=(k,v)=>setC(s=>({...s,[k]:v}));
-
-  // calculadora depreciação
-  const [calc,setCalc] = useState({valor:"", perc:"15", kmAno:"30000"});
-  const depCalc = num(calc.kmAno)>0 ? (num(calc.valor)*(num(calc.perc)/100))/num(calc.kmAno) : 0;
 
   // nova despesa
   const [nd,setNd] = useState({data:todayISO(), descricao:"", valor:"", tipo:"vidautil", vidaKm:""});
@@ -601,10 +680,8 @@ function Custos({custos, despesas, periodos, onSaveCustos, onAddDespesa, onDelDe
     setNd({data:todayISO(), descricao:"", valor:"", tipo:"vidautil", vidaKm:""});
   };
 
-  const bk = custoBreakdown(c, despesas, periodos);
+  const bk = custoBreakdown(c, despesas, periodos, veiculo);
   const kmMesInfo = num(c.kmMes)>0 ? "informado" : "estimado pelo histórico";
-
-  const nivelAtivo = DEP_LEVELS.find(l=>Math.abs(l.val-num(c.depreciacao))<0.001);
 
   return (
     <div className="fadein">
@@ -618,34 +695,7 @@ function Custos({custos, despesas, periodos, onSaveCustos, onAddDespesa, onDelDe
         <div className="hintbox">Referência atual: <b>{n1(bk.kmMesRef)} km/mês</b> ({kmMesInfo}).</div>
       </div>
 
-      {/* Depreciação */}
-      <div className="card">
-        <h3>{I.trend} Depreciação <Info onOpen={onInfo} text="depreciacao"/></h3>
-        <p style={{margin:"0 0 6px",color:"var(--muted)",fontSize:".86rem"}}>Quanto o carro perde de valor por km rodado. Escolha um nível ou calcule o seu.</p>
-        <div className="levels">
-          {DEP_LEVELS.map(l=>(
-            <div key={l.key} className={"level"+(nivelAtivo&&nivelAtivo.key===l.key?" on":"")} onClick={()=>set("depreciacao",l.val)}>
-              <div className="lv">{l.lv}</div>
-              <div className="pv">{brl(l.val)}</div>
-              <div className="dc">{l.dc}</div>
-            </div>
-          ))}
-        </div>
-        <Field label="Depreciação usada (R$/km)" pre="R$" value={c.depreciacao} onChange={v=>set("depreciacao",v)} placeholder="0,35" />
-        <details style={{marginTop:4}}>
-          <summary style={{cursor:"pointer",color:"var(--accent)",fontSize:".85rem",fontWeight:600}}>Calcular pela minha realidade</summary>
-          <div style={{marginTop:12}}>
-            <Field label="Valor atual do carro" pre="R$" value={calc.valor} onChange={v=>setCalc(s=>({...s,valor:v}))} placeholder="80000" />
-            <div className="grid2">
-              <Field label="Perde por ano" suf="%" value={calc.perc} onChange={v=>setCalc(s=>({...s,perc:v}))} placeholder="15" />
-              <Field label="KM por ano" suf="km" value={calc.kmAno} onChange={v=>setCalc(s=>({...s,kmAno:v}))} placeholder="30000" />
-            </div>
-            <div className="hintbox">Depreciação calculada: <b>{brl3(depCalc)}/km</b>.
-              <div className="btnrow" style={{marginTop:10}}><button className="btn ghost sm" onClick={()=>set("depreciacao",Number(depCalc.toFixed(3)))}>Usar este valor</button></div>
-            </div>
-          </div>
-        </details>
-      </div>
+      <div className="hintbox" style={{marginTop:14}}>A <b>depreciação</b> agora fica em <b style={{color:"var(--accent)"}}>Meu veículo</b>, calculada pelo valor do carro.</div>
 
       {/* Seguro */}
       <div className="card">
@@ -728,20 +778,149 @@ function Custos({custos, despesas, periodos, onSaveCustos, onAddDespesa, onDelDe
   );
 }
 
+/* ---------- Veículo ---------- */
+const ENERGIAS = [
+  { key:"combustao", nome:"Combustão", ic:"fuel", desc:"Gasolina, etanol, diesel ou GNV" },
+  { key:"eletrico", nome:"Elétrico", ic:"bolt", desc:"Carrega na tomada (kWh)" },
+  { key:"hibrido", nome:"Híbrido", ic:"fuel", desc:"Usa combustível como base" },
+];
+function Veiculo({veiculo, custos, despesas, periodos, onSave, onInfo}){
+  const [v,setV] = useState(veiculo);
+  useEffect(()=>setV(veiculo),[veiculo]);
+  const set=(k,val)=>setV(s=>({...s,[k]:val}));
+  const u = unidades(v.tipoEnergia);
+  const kmMesRef = num(custos.kmMes)>0 ? num(custos.kmMes) : kmMesEstimado(periodos);
+  const depAuto = depreciacaoAuto(v, kmMesRef);
+  const nivel = num(v.desvalorizaAno);
+  const setNivel = n => set("desvalorizaAno", n);
+
+  return (
+    <div className="fadein">
+      <div className="section-title"><h2>Meu veículo</h2></div>
+
+      {/* Tipo de energia */}
+      <div className="card">
+        <h3>{I.bolt} Tipo de energia <Info onOpen={onInfo} text="energia"/></h3>
+        <div className="levels">
+          {ENERGIAS.map(e=>(
+            <div key={e.key} className={"level"+(v.tipoEnergia===e.key?" on":"")} onClick={()=>set("tipoEnergia",e.key)}>
+              <div className="lv">{e.nome}</div>
+              <div className="dc" style={{marginTop:6}}>{e.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Consumo e preço */}
+      <div className="card">
+        <h3>{I.fuel} Consumo e preço <Info onOpen={onInfo} text="consumoperfil"/></h3>
+        <p style={{margin:"0 0 12px",color:"var(--muted)",fontSize:".86rem"}}>Preenchido uma vez, usado em todos os registros. Você pode ajustar num período específico se precisar.</p>
+        <div className="grid2">
+          <Field label={"Consumo médio ("+u.dist+")"} info="consumo" onInfo={onInfo} value={v.consumo||""} onChange={val=>set("consumo",val)} placeholder={v.tipoEnergia==="eletrico"?"6,0":"10,0"} />
+          <Field label={"Preço "+u.energiaNome} pre="R$" suf={"/"+u.energia} info="preco" onInfo={onInfo} value={v.preco||""} onChange={val=>set("preco",val)} placeholder={v.tipoEnergia==="eletrico"?"0,90":"7,00"} />
+        </div>
+        {v.tipoEnergia==="hibrido" && <div className="hintbox">Para híbrido, informe o consumo e preço do combustível. Se recarrega bastante na tomada, use um consumo médio equivalente que reflita seu gasto real.</div>}
+      </div>
+
+      {/* Depreciação pelo valor */}
+      <div className="card">
+        <h3>{I.trend} Quanto o carro perde de valor <Info onOpen={onInfo} text="depreciacao"/></h3>
+        <p style={{margin:"0 0 12px",color:"var(--muted)",fontSize:".86rem"}}>Seu carro vale menos a cada km. Guardar por isso evita o aperto na hora de trocar.</p>
+        <div className="modes">
+          <button className={v.depModo!=="manual"?"on":""} onClick={()=>set("depModo","auto")}>Calcular pelo valor</button>
+          <button className={v.depModo==="manual"?"on":""} onClick={()=>set("depModo","manual")}>Digitar R$/km</button>
+        </div>
+        {v.depModo!=="manual" ? (
+          <div>
+            <Field label="Valor atual do carro" pre="R$" info="valorcarro" onInfo={onInfo} value={v.valor||""} onChange={val=>set("valor",val)} placeholder="80000" />
+            <div className="field" style={{marginBottom:8}}><label>Quanto desvaloriza por ano <Info onOpen={onInfo} text="desvaloriza"/></label></div>
+            <div className="levels">
+              {[["Pouco",10],["Médio",15],["Muito",20]].map(([lab,val])=>(
+                <div key={val} className={"level"+(nivel===val?" on":"")} onClick={()=>setNivel(val)}>
+                  <div className="lv">{lab}</div>
+                  <div className="pv">{val}%</div>
+                  <div className="dc">ao ano</div>
+                </div>
+              ))}
+            </div>
+            <div className="hintbox">Rodando <b>{n1(kmMesRef)} km/mês</b>, isso dá <b>{brl3(depAuto)}/km</b>{num(v.valor)>0?"":" (informe o valor do carro)"}.</div>
+          </div>
+        ) : (
+          <Field label="Depreciação (R$/km)" pre="R$" value={custos.depreciacao} onChange={()=>{}} placeholder="0,35" info="depmanual" onInfo={onInfo} />
+        )}
+        {v.depModo==="manual" && <div className="hintbox">O valor manual é editado na aba <b style={{color:"var(--accent)"}}>Custos</b>. Aqui mostramos só como referência.</div>}
+      </div>
+
+      <div className="btnrow"><button className="btn" onClick={()=>onSave(v)}>Salvar veículo</button></div>
+    </div>
+  );
+}
+
+/* ---------- Gestão (dividir o dinheiro) ---------- */
+const ENVELOPES = [
+  { key:"manutencao", nome:"Guardar p/ manutenção", ic:"tools", cor:"var(--amber)", txt:"Pra quando o carro precisar de conserto, pneu, revisão." },
+  { key:"emergencia", nome:"Reserva de emergência", ic:"shield", cor:"var(--blue)", txt:"Pra meses fracos, imprevistos e sua tranquilidade." },
+  { key:"impostos", nome:"Impostos / INSS", ic:"wallet", cor:"var(--violet)", txt:"Pra não ser pego de surpresa e garantir sua aposentadoria." },
+  { key:"prolabore", nome:"Seu salário (pró-labore)", ic:"pig", cor:"var(--accent)", txt:"O dinheiro que é seu de verdade pra viver este mês." },
+  { key:"lucro", nome:"Lucro do negócio", ic:"trend", cor:"var(--accent)", txt:"O retorno de ser dono. Pode virar reserva, upgrade ou seu prêmio." },
+];
+function Gestao({gestao, periodos, custoKm, veiculo, onSave, onInfo}){
+  const [g,setG] = useState(gestao);
+  useEffect(()=>setG(gestao),[gestao]);
+  const set=(k,v)=>setG(s=>({...s,[k]:v}));
+  const rep = repartir(100, g); // por R$ 100
+  const somaOk = Math.abs(rep.somaPct-100) < 0.01;
+
+  return (
+    <div className="fadein">
+      <div className="section-title"><h2>Meu negócio</h2></div>
+
+      <div className="card">
+        <h3>{I.pig} Dividir o dinheiro <Info onOpen={onInfo} text="gestao"/></h3>
+        <p style={{margin:"0 0 4px",color:"var(--muted)",fontSize:".9rem"}}>A maioria trata todo o faturamento como se fosse salário — e se dá mal. Aqui você separa cada parte antes de gastar, como uma empresa de verdade.</p>
+      </div>
+
+      <div className="card">
+        <h3>De cada R$ 100 que você fatura</h3>
+        {ENVELOPES.map(e=>(
+          <div key={e.key} style={{padding:"12px 0",borderTop:"1px solid var(--line)"}}>
+            <div className="mrow" style={{padding:0,border:0}}>
+              <span className="k" style={{color:"var(--text)",fontWeight:650}}>{e.nome} <Info onOpen={onInfo} text={"env_"+e.key}/></span>
+              <span className="v" style={{color:e.cor}}>{brl(rep[e.key])}</span>
+            </div>
+            <div style={{color:"var(--faint)",fontSize:".76rem",margin:"2px 0 8px"}}>{e.txt}</div>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <input type="range" min="0" max="100" step="1" value={num(g[e.key])} onChange={ev=>set(e.key,num(ev.target.value))} style={{flex:1}} />
+              <div className="in" style={{width:82,padding:"0 10px"}}>
+                <input type="number" inputMode="numeric" value={g[e.key]} onChange={ev=>set(e.key,ev.target.value)} style={{padding:"9px 0",textAlign:"right"}} />
+                <span className="suf">%</span>
+              </div>
+            </div>
+          </div>
+        ))}
+        <div className="mrow total"><span className="k">Soma</span><span className={"v "+(somaOk?"good":"bad")}>{n1(rep.somaPct)}%</span></div>
+        {!somaOk && <div className="hintbox" style={{borderColor:"var(--red)"}}>A soma precisa dar 100%. Ajuste os valores.</div>}
+      </div>
+
+      <div className="btnrow"><button className="btn" onClick={()=>onSave(g)}>Salvar plano</button></div>
+    </div>
+  );
+}
+
 /* ---------- Exportar ---------- */
 function baixar(nome,conteudo,tipo){
   const blob=new Blob([conteudo],{type:tipo}); const url=URL.createObjectURL(blob);
   const a=document.createElement("a"); a.href=url; a.download=nome; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
 }
-function Exportar({state, custoKm, onImport, onWipe}){
+function Exportar({state, custoKm, veiculo, onImport, onWipe}){
   const fileRef = useRef();
   const exportJSON = ()=>baixar(`ganhos-corridas-backup-${todayISO()}.json`, JSON.stringify(state,null,2), "application/json");
   const exportMD = ()=>{
     const ord=[...state.periodos].sort((a,b)=>(a.data||"").localeCompare(b.data||""));
     let md=`# Ganhos de corridas — Juarez\n\nGerado em ${new Date().toLocaleString('pt-BR')}\n\nCusto por km considerado: ${brl3(custoKm)}\n\n`;
-    md+=`| Data | Fat. | Gasolina | Saldo | Líquido | R$/h | KM | Horas |\n|---|---|---|---|---|---|---|---|\n`;
+    md+=`| Data | Fat. | Energia | Saldo | Líquido | R$/h | KM | Horas |\n|---|---|---|---|---|---|---|---|\n`;
     const t={fat:0,gas:0,saldo:0,liq:0,km:0,horas:0};
-    ord.forEach(p=>{const c=calcular(p,custoKm);t.fat+=c.faturamento;t.gas+=c.gasto;t.saldo+=c.saldo;t.liq+=c.liquido;t.km+=c.km;t.horas+=c.horas;
+    ord.forEach(p=>{const c=calcular(p,custoKm,veiculo);t.fat+=c.faturamento;t.gas+=c.gasto;t.saldo+=c.saldo;t.liq+=c.liquido;t.km+=c.km;t.horas+=c.horas;
       md+=`| ${fmtDate(p.data)} | ${brl(c.faturamento)} | ${brl(c.gasto)} | ${brl(c.saldo)} | ${brl(c.liquido)} | ${c.rHora?brl(c.rHora):"—"} | ${n1(c.km)} | ${n1(c.horas)} |\n`;});
     md+=`| **Total** | **${brl(t.fat)}** | **${brl(t.gas)}** | **${brl(t.saldo)}** | **${brl(t.liq)}** | **${t.horas?brl(t.fat/t.horas):"—"}** | **${n1(t.km)}** | **${n1(t.horas)}** |\n`;
     baixar(`ganhos-corridas-${todayISO()}.md`, md, "text/markdown");
@@ -775,13 +954,13 @@ function Exportar({state, custoKm, onImport, onWipe}){
 }
 
 /* ---------- Dashboard ---------- */
-function Dashboard({periodos, custoKm, breakdown, go}){
+function Dashboard({periodos, custoKm, breakdown, veiculo, gestao, go, onInfo}){
   const ord = useMemo(()=>[...periodos].sort((a,b)=>(a.data||"").localeCompare(b.data||"")||(a.id||"").localeCompare(b.id||"")), [periodos]);
   const [modo,setModo] = useState("liquido");
-  const totais = ord.reduce((a,p)=>{ const c=calcular(p,custoKm); a.fat+=c.faturamento;a.saldo+=c.saldo;a.liq+=c.liquido;a.km+=c.km;a.horas+=c.horas;a.gas+=c.gasto; return a; },{fat:0,saldo:0,liq:0,km:0,horas:0,gas:0});
+  const totais = ord.reduce((a,p)=>{ const c=calcular(p,custoKm,veiculo); a.fat+=c.faturamento;a.saldo+=c.saldo;a.liq+=c.liquido;a.km+=c.km;a.horas+=c.horas;a.gas+=c.gasto; return a; },{fat:0,saldo:0,liq:0,km:0,horas:0,gas:0});
   const last = ord[ord.length-1];
-  const lc = last ? calcular(last,custoKm) : null;
-  const chartVal = p => { const c=calcular(p,custoKm); return modo==="fat"?c.faturamento:modo==="saldo"?c.saldo:c.liquido; };
+  const lc = last ? calcular(last,custoKm,veiculo) : null;
+  const chartVal = p => { const c=calcular(p,custoKm,veiculo); return modo==="fat"?c.faturamento:modo==="saldo"?c.saldo:c.liquido; };
   const chartData = ord.slice(-8).map(p=>({v:chartVal(p), label:fmtShort(p.data)}));
   const chartTotal = modo==="fat"?totais.fat:modo==="saldo"?totais.saldo:totais.liq;
   const [ip,ic] = brlParts(lc?lc.liquido:0);
@@ -830,10 +1009,53 @@ function Dashboard({periodos, custoKm, breakdown, go}){
       <div className="card" style={{marginTop:14}}>
         <h3>Ganho líquido estimado</h3>
         <div className="mrow"><span className="k">Líquido total</span><span className={"v "+(totais.liq>=0?"good":"bad")}>{brl(totais.liq)}</span></div>
-        <div className="mrow"><span className="k">Saldo total (só combustível)</span><span className="v">{brl(totais.saldo)}</span></div>
+        <div className="mrow"><span className="k">Saldo total (só energia)</span><span className="v">{brl(totais.saldo)}</span></div>
         <div className="mrow"><span className="k">Custo total por km</span><span className="v">{brl3(custoKm)}</span></div>
         <div className="mrow"><span className="k">R$/km líquido</span><span className="v">{totais.km?brl(totais.liq/totais.km):"—"}</span></div>
       </div>
+
+      {/* Para onde vai seu dinheiro */}
+      {(()=>{
+        const rep = repartir(totais.fat, gestao);
+        const custoTotal = totais.fat - totais.liq; // energia + custos do carro
+        const barras = [
+          {lab:"Energia + custos do carro", val:custoTotal, cor:"var(--red)"},
+          {lab:"Guardar p/ manutenção", val:rep.manutencao, cor:"var(--amber)"},
+          {lab:"Reserva de emergência", val:rep.emergencia, cor:"var(--blue)"},
+          {lab:"Impostos / INSS", val:rep.impostos, cor:"var(--violet)"},
+          {lab:"Seu salário", val:rep.prolabore, cor:"var(--accent)"},
+          {lab:"Lucro do negócio", val:rep.lucro, cor:"var(--accent-dim)"},
+        ];
+        const maxV = Math.max(...barras.map(b=>Math.abs(b.val)), 1);
+        return (
+          <div>
+            <div className="section-title"><h2>Para onde vai seu dinheiro <Info onOpen={onInfo} text="paraonde"/></h2><span className="link" onClick={()=>go("gestao")}>ajustar</span></div>
+            <div className="card">
+              <p style={{margin:"0 0 14px",color:"var(--muted)",fontSize:".86rem"}}>Do total faturado ({brl(totais.fat)}), sai o custo do carro e o resto você separa em envelopes. Só o "salário" é seu pra gastar agora.</p>
+              {barras.map((b,i)=>(
+                <div key={i} style={{margin:"11px 0"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",fontSize:".84rem",marginBottom:5}}>
+                    <span style={{color:"var(--muted)"}}>{b.lab}</span><b>{brl(b.val)}</b>
+                  </div>
+                  <div style={{height:9,background:"var(--bg2)",borderRadius:999,overflow:"hidden"}}>
+                    <div style={{height:"100%",width:Math.max(2,(Math.abs(b.val)/maxV)*100)+"%",background:b.cor,borderRadius:999}}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="stats2" style={{marginTop:14}}>
+              <div className="stat"><div className="ic green">{I.pig}</div><div className="v">{brl(rep.prolabore)}</div><div className="k">Seu salário (pró-labore)</div></div>
+              <div className="stat"><div className="ic amber">{I.trend}</div><div className="v">{brl(rep.lucro)}</div><div className="k">Lucro do negócio</div></div>
+            </div>
+            <div className="card" style={{marginTop:14}}>
+              <h3>{I.target} Metas por hora e por km <Info onOpen={onInfo} text="equilibrio"/></h3>
+              <div className="mrow"><span className="k">Custo médio por km</span><span className="v">{brl3(totais.km?custoTotal/totais.km:0)}</span></div>
+              <div className="mrow"><span className="k">Para empatar (ponto de equilíbrio)</span><span className="v">{brl(totais.horas?custoTotal/totais.horas:0)}/h</span></div>
+              <div className="mrow total"><span className="k">Você faz hoje</span><span className={"v "+(totais.horas&&totais.fat/totais.horas>=custoTotal/(totais.horas||1)?"good":"bad")}>{totais.horas?brl(totais.fat/totais.horas):"—"}/h</span></div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -844,15 +1066,28 @@ const INFOS = {
   horas: { t:"Horas trabalhadas", b:"Tempo total conectado/rodando no período. Use o cronômetro para medir automaticamente, ou digite na mão se esqueceu de acionar. É a base do seu R$/hora — o indicador mais honesto de quanto seu tempo rende." },
   cronometro: { t:"Cronômetro", b:"Toque em iniciar ao começar a rodar e pausar ao parar. Ele conta o tempo mesmo se você trocar de tela. Ao final, toque em 'Usar X h no registro' para preencher as horas. Se esquecer, é só digitar manualmente." },
   km: { t:"KM rodados", b:"Distância total do período. 'Total direto': você digita os km. 'Início e fim': você informa o odômetro no começo e no fim, e o app calcula a diferença — útil para não errar e pegar inclusive o deslocamento sem passageiro." },
-  consumo: { t:"Consumo (km/L)", b:"Quantos km seu carro faz com 1 litro. Ex: 10 km/L. Se não souber, encha o tanque, zere o trip, rode e na próxima calibragem divida os km pelos litros abastecidos." },
-  preco: { t:"Preço do combustível", b:"Valor pago por litro no último abastecimento (R$/L). Mantenha atualizado, pois o preço muda bastante e afeta direto seu custo." },
+  consumo: { t:"Consumo", b:"Quanto seu carro anda com uma unidade de energia. Combustão: km por litro (ex: 10 km/L). Elétrico: km por kWh (ex: 6 km/kWh). Se não souber, encha/carregue completo, zere o trip, rode e depois divida os km pela quantidade que repôs." },
+  preco: { t:"Preço da energia", b:"Combustão: valor pago por litro (R$/L). Elétrico: valor por kWh (R$/kWh) — some o custo da energia em casa ou no ponto de recarga. Mantenha atualizado, pois muda bastante e afeta direto seu custo." },
   kmmes: { t:"KM por mês", b:"Quantos km você roda em média por mês. Serve para converter custos mensais (como seguro) e gastos correntes em custo por km. Se deixar vazio, o app estima pela média dos seus registros e vai refinando conforme você usa." },
-  depreciacao: { t:"Depreciação", b:"É o custo invisível que mais engana o motorista: seu carro perde valor a cada km rodado. Guardar por conta disso evita o susto na hora de trocar de carro.\n\nBase das sugestões: carro popular de ~R$ 80 mil rodando ~30 mil km/ano. Conservador ~R$ 0,20/km (perde ~10%/ano), Moderado ~R$ 0,35/km (~15%/ano), Alto ~R$ 0,50/km (~20%/ano). Calculadoras de veículos no Brasil costumam usar ~20% ao ano como padrão. Ajuste ao seu carro na calculadora. (Valores de referência, não recomendação financeira.)" },
+  depreciacao: { t:"Depreciação (perda de valor)", b:"É o custo invisível que mais engana o motorista: seu carro perde valor a cada km rodado. Guardar por conta disso evita o susto na hora de trocar de carro.\n\nO app calcula sozinho: valor do carro × quanto desvaloriza por ano ÷ km rodados no ano. Ex: carro de R$ 80 mil que perde 15%/ano rodando 36 mil km = cerca de R$ 0,33/km. Calculadoras de veículos no Brasil costumam usar ~20% ao ano como padrão. (Referência, não recomendação financeira.)" },
   seguro: { t:"Seguro", b:"Você pode informar direto em R$/km, ou lançar o valor mensal e o app converte usando seus km/mês. Ex: seguro de R$ 220/mês ÷ 3.000 km = R$ 0,073/km." },
   manutfixa: { t:"Manutenção fixa por km", b:"Uma forma simples: um valor médio por km para manutenção e outros itens. Se preferir precisão, deixe zero aqui e use o 'Registro de despesas' para lançar os gastos reais." },
   despesas: { t:"Registro de despesas", b:"Lance seus gastos reais. O app soma tudo e transforma em R$/km automaticamente. Existem dois tipos, escolhidos em cada lançamento." },
   tipodespesa: { t:"Tipo de despesa", b:"'Item que dura (km)': pneu, óleo, correia — coisas que duram uma quilometragem. O custo é diluído pela vida útil.\n\n'Gasto corrente': lavagem, pedágio, lanche — não têm vida útil em km. O custo é rateado pelos km que você rodou no mês do gasto.\n\nObservação: gastos como alimentação são discutíveis como custo do carro (muitos consideram despesa pessoal). Registre do jeito que fizer sentido pra você." },
   vidautil: { t:"Vida útil (km)", b:"Quantos km o item costuma durar. Ex: um pneu de R$ 1.200 que dura 40.000 km custa R$ 0,03/km. Se não souber, use uma estimativa conservadora." },
+  energia: { t:"Tipo de energia", b:"Escolha como seu carro se move. Combustão: gasolina, etanol, diesel ou GNV (medido em km/L e R$/L). Elétrico: carrega na tomada (km/kWh e R$/kWh). Híbrido: use o combustível como base. O app troca as unidades sozinho conforme sua escolha." },
+  consumoperfil: { t:"Consumo e preço", b:"Você preenche uma vez aqui e o app usa em todos os registros — não precisa digitar toda vez. Se num dia específico o consumo ou o preço foi diferente, dá pra ajustar só naquele registro." },
+  valorcarro: { t:"Valor do carro", b:"Quanto seu carro vale hoje (valor de venda aproximado, tipo tabela FIPE). É a base para calcular quanto ele perde por km rodado. Vá atualizando de tempos em tempos." },
+  desvaloriza: { t:"Desvalorização por ano", b:"Quanto o carro perde de valor a cada ano. Carros mais novos e caros costumam perder mais; populares e já rodados perdem menos. Pouco ~10%, Médio ~15%, Muito ~20% ao ano — padrão comum em calculadoras de veículos no Brasil. (Referência, não recomendação financeira.)" },
+  depmanual: { t:"Depreciação manual", b:"Se você já sabe o valor em R$/km que quer usar, escolha 'Digitar R$/km' e informe na aba Custos. Caso contrário, deixe o app calcular pelo valor do carro." },
+  gestao: { t:"Dividir o dinheiro", b:"A ideia central: faturamento NÃO é lucro. Antes de gastar, separe cada parte — o que guardar para o carro, para emergências e impostos, o seu salário e o lucro do dono.\n\nOs percentuais aqui incidem sobre o faturamento (jeito mais simples de acompanhar). O jeito contábil mais preciso é aplicar sobre o que sobra depois dos custos; se quiser, ajuste os percentuais pensando nisso. Os valores padrão são um ponto de partida, não uma regra." },
+  env_manutencao: { t:"Guardar p/ manutenção", b:"Todo carro quebra e precisa de revisão, pneu, óleo. Separando um pouco de cada corrida, o dinheiro está lá quando a conta chegar — em vez de virar dívida." },
+  env_emergencia: { t:"Reserva de emergência", b:"Meses fracos, doença, um problema sério no carro. Ter uma reserva evita que um imprevisto vire uma crise. Idealmente, junte o equivalente a alguns meses de despesa." },
+  env_impostos: { t:"Impostos / INSS", b:"Como autônomo, vale guardar para impostos e, principalmente, para o INSS — sua aposentadoria e proteção. Muitos esquecem disso e se arrependem lá na frente." },
+  env_prolabore: { t:"Seu salário (pró-labore)", b:"É o pagamento pelo seu trabalho de dirigir. Trate como salário: é o que você pode usar para viver este mês. Separá-lo do lucro te dá clareza real de quanto ganha." },
+  env_lucro: { t:"Lucro do negócio", b:"O que sobra depois de tudo é o retorno de ser dono do negócio. Pode virar reserva maior, troca de carro, ou seu prêmio. Um negócio saudável dá lucro além do salário." },
+  paraonde: { t:"Para onde vai seu dinheiro", b:"Este painel mostra, do total que você faturou, quanto foi custo do carro e como o restante se divide nos envelopes que você definiu em 'Meu negócio'. É a visão de dono: você sabe exatamente para onde cada real vai." },
+  equilibrio: { t:"Ponto de equilíbrio", b:"É quanto você precisa fazer por hora só para cobrir os custos (sem lucro nem salário). Se o seu R$/hora atual está acima disso, o negócio se paga e ainda sobra. Se está abaixo, você está trabalhando no prejuízo." },
 };
 
 /* ---------- App ---------- */
@@ -871,8 +1106,8 @@ function App(){
   const go = t => { setTab(t); setSheet(false); window.scrollTo({top:0,behavior:"smooth"}); };
   const openInfo = key => setInfo(key);
 
-  const custoKm = useMemo(()=>custoExtraKm(state.custos, state.despesas, state.periodos), [state]);
-  const breakdown = useMemo(()=>custoBreakdown(state.custos, state.despesas, state.periodos), [state]);
+  const custoKm = useMemo(()=>custoExtraKm(state.custos, state.despesas, state.periodos, state.veiculo), [state]);
+  const breakdown = useMemo(()=>custoBreakdown(state.custos, state.despesas, state.periodos, state.veiculo), [state]);
 
   const savePeriodo = f => {
     if(num(f.faturamento)===0 && num(f.km)===0){ notify("Informe faturamento e/ou km"); return; }
@@ -886,11 +1121,13 @@ function App(){
   const saveCustos = c => { setState(s=>({...s,custos:Object.assign({},defaultCustos,c,{depreciacao:num(c.depreciacao),manutencao:num(c.manutencao),seguro:num(c.seguro),outros:num(c.outros),seguroMensal:num(c.seguroMensal),kmMes:num(c.kmMes)})})); notify("Custos salvos"); go("dashboard"); };
   const addDespesa = d => { setState(s=>({...s, despesas:[...s.despesas, d]})); notify("Despesa adicionada"); };
   const delDespesa = id => { setState(s=>({...s, despesas:s.despesas.filter(d=>d.id!==id)})); notify("Despesa removida"); };
-  const importData = d => { setState({periodos:d.periodos||[], custos:Object.assign({},defaultCustos,d.custos||{}), despesas:Array.isArray(d.despesas)?d.despesas:[]}); notify("Backup importado"); go("dashboard"); };
+  const saveVeiculo = v => { setState(s=>({...s, veiculo:Object.assign({},defaultVeiculo,v,{valor:num(v.valor),desvalorizaAno:num(v.desvalorizaAno),consumo:num(v.consumo),preco:num(v.preco)})})); notify("Veículo salvo"); go("dashboard"); };
+  const saveGestao = g => { setState(s=>({...s, gestao:Object.assign({},defaultGestao,g)})); notify("Plano salvo"); go("dashboard"); };
+  const importData = d => { setState({periodos:d.periodos||[], custos:Object.assign({},defaultCustos,d.custos||{}), despesas:Array.isArray(d.despesas)?d.despesas:[], veiculo:Object.assign({},defaultVeiculo,d.veiculo||{}), gestao:Object.assign({},defaultGestao,d.gestao||{})}); notify("Backup importado"); go("dashboard"); };
   const wipe = () => { if(confirm("Apagar TODOS os dados deste dispositivo?") && confirm("Confirmar? Isso não pode ser desfeito.")){ setState(JSON.parse(JSON.stringify(defaultState))); notify("Tudo apagado"); go("dashboard"); } };
 
-  const isMais = tab==="config" || tab==="exportar";
-  const title = tab==="dashboard"?"Meus ganhos":tab==="registrar"?"Registrar":tab==="historico"?"Histórico":tab==="config"?"Custos":"Exportar";
+  const isMais = tab==="config" || tab==="exportar" || tab==="veiculo" || tab==="gestao";
+  const title = tab==="dashboard"?"Meus ganhos":tab==="registrar"?"Registrar":tab==="historico"?"Histórico":tab==="config"?"Custos":tab==="veiculo"?"Meu veículo":tab==="gestao"?"Meu negócio":"Exportar";
   const infoData = info ? INFOS[info] : null;
 
   return (
@@ -900,11 +1137,13 @@ function App(){
         <button className="iconbtn" onClick={()=>go("config")} aria-label="Custos">{I.gear}</button>
       </div>
 
-      {tab==="dashboard" && <Dashboard periodos={state.periodos} custoKm={custoKm} breakdown={breakdown} go={go} />}
-      {tab==="registrar" && <Registrar custoKm={custoKm} onSave={savePeriodo} editing={editing} onCancel={()=>setEditing(null)} onInfo={openInfo} />}
-      {tab==="historico" && <Historico periodos={state.periodos} custoKm={custoKm} onEdit={editPeriodo} />}
-      {tab==="config" && <Custos custos={state.custos} despesas={state.despesas} periodos={state.periodos} onSaveCustos={saveCustos} onAddDespesa={addDespesa} onDelDespesa={delDespesa} onInfo={openInfo} />}
-      {tab==="exportar" && <Exportar state={state} custoKm={custoKm} onImport={importData} onWipe={wipe} />}
+      {tab==="dashboard" && <Dashboard periodos={state.periodos} custoKm={custoKm} breakdown={breakdown} veiculo={state.veiculo} gestao={state.gestao} go={go} onInfo={openInfo} />}
+      {tab==="registrar" && <Registrar custoKm={custoKm} veiculo={state.veiculo} onSave={savePeriodo} editing={editing} onCancel={()=>setEditing(null)} onInfo={openInfo} go={go} />}
+      {tab==="historico" && <Historico periodos={state.periodos} custoKm={custoKm} veiculo={state.veiculo} onEdit={editPeriodo} />}
+      {tab==="veiculo" && <Veiculo veiculo={state.veiculo} custos={state.custos} despesas={state.despesas} periodos={state.periodos} onSave={saveVeiculo} onInfo={openInfo} />}
+      {tab==="config" && <Custos custos={state.custos} despesas={state.despesas} periodos={state.periodos} veiculo={state.veiculo} onSaveCustos={saveCustos} onAddDespesa={addDespesa} onDelDespesa={delDespesa} onInfo={openInfo} />}
+      {tab==="gestao" && <Gestao gestao={state.gestao} periodos={state.periodos} custoKm={custoKm} veiculo={state.veiculo} onSave={saveGestao} onInfo={openInfo} />}
+      {tab==="exportar" && <Exportar state={state} custoKm={custoKm} veiculo={state.veiculo} onImport={importData} onWipe={wipe} />}
 
       {tab==="registrar" && editing && (
         <div className="btnrow"><button className="btn danger" onClick={()=>{deletePeriodo(editing.id); setEditing(null); go("historico");}}>Excluir este período</button></div>
@@ -927,6 +1166,12 @@ function App(){
       {!infoData && (
         <div className={"sheet"+(sheet?" open":"")}>
           <div className="grab"></div>
+          <button className={"sheet-item"+(tab==="veiculo"?" on":"")} onClick={()=>go("veiculo")}>
+            <span className="si">{I.car}</span> Meu veículo <span className="chev">{I.chev}</span>
+          </button>
+          <button className={"sheet-item"+(tab==="gestao"?" on":"")} onClick={()=>go("gestao")}>
+            <span className="si">{I.pig}</span> Meu negócio (dividir o dinheiro) <span className="chev">{I.chev}</span>
+          </button>
           <button className={"sheet-item"+(tab==="config"?" on":"")} onClick={()=>go("config")}>
             <span className="si">{I.gear}</span> Custos e despesas <span className="chev">{I.chev}</span>
           </button>
