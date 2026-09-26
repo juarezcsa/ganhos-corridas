@@ -38,17 +38,18 @@ input,textarea,select{width:100%}
   display:flex;align-items:center;justify-content:center;color:var(--text)}
 .iconbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
-/* filtro/segment */
+/* segment */
 .seg{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px;margin-bottom:20px}
 .seg button{flex:1;padding:9px 6px;border-radius:999px;font-size:.82rem;font-weight:600;color:var(--muted);transition:.15s}
 .seg button.on{background:var(--accent);color:#12220a}
+.seg.mini button{padding:7px 6px;font-size:.78rem}
 
 /* big balance */
 .balance{margin:6px 2px 4px}
 .balance .lbl{color:var(--muted);font-size:.86rem;margin-bottom:6px}
 .balance .amt{font-size:2.7rem;font-weight:800;letter-spacing:-.03em;line-height:1}
 .balance .amt .cents{font-size:1.5rem;color:var(--muted);font-weight:700}
-.balance .sub{margin-top:10px;font-size:.84rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+.balance .sub{margin-top:10px;font-size:.84rem;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tag{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;font-size:.76rem;font-weight:700}
 .tag.up{background:rgba(182,240,74,.14);color:var(--accent)}
 .tag.down{background:rgba(255,141,141,.14);color:var(--red)}
@@ -56,10 +57,10 @@ input,textarea,select{width:100%}
 /* cards */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
 .card + .card{margin-top:14px}
-.card h3{margin:0 0 14px;font-size:1rem;font-weight:700}
+.card h3{margin:0 0 14px;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:6px}
 .section-title{display:flex;align-items:center;justify-content:space-between;margin:26px 2px 12px}
-.section-title h2{font-size:1.05rem;font-weight:700;margin:0}
-.section-title .link{color:var(--muted);font-size:.82rem;font-weight:600}
+.section-title h2{font-size:1.05rem;font-weight:700;margin:0;display:flex;align-items:center;gap:6px}
+.section-title .link{color:var(--accent);font-size:.82rem;font-weight:600}
 
 /* stat pair */
 .stats2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -68,15 +69,18 @@ input,textarea,select{width:100%}
 .stat .ic svg{width:18px;height:18px;stroke:#12220a;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .stat .ic.green{background:var(--accent)} .stat .ic.violet{background:var(--violet)}
 .stat .ic.blue{background:var(--blue)} .stat .ic.amber{background:var(--amber)}
+.stat .ic.red{background:var(--red)}
 .stat .v{font-size:1.28rem;font-weight:800;letter-spacing:-.02em}
 .stat .k{color:var(--muted);font-size:.78rem;margin-top:2px}
 
-/* mini metrics row inside card */
-.mrow{display:flex;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line)}
+/* mini metrics row */
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid var(--line);gap:10px}
 .mrow:first-of-type{border-top:0}
-.mrow .k{color:var(--muted);font-size:.88rem}
-.mrow .v{font-weight:700;font-variant-numeric:tabular-nums}
+.mrow .k{color:var(--muted);font-size:.88rem;display:flex;align-items:center;gap:5px}
+.mrow .v{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
 .v.good{color:var(--accent)} .v.bad{color:var(--red)}
+.mrow.total{border-top:1px solid var(--line2);margin-top:4px}
+.mrow.total .k{color:var(--text);font-weight:700}
 
 /* chart */
 .chart-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
@@ -99,11 +103,13 @@ svg.line{display:block;width:100%;height:150px;overflow:visible}
 
 /* form */
 .field{margin-bottom:14px}
-.field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:7px}
+.field label{display:flex;align-items:center;gap:5px;font-size:.82rem;color:var(--muted);margin-bottom:7px}
 .field .in{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:0 14px}
 .field .in:focus-within{border-color:var(--accent-dim)}
 .field .in .pre{color:var(--faint);font-size:.9rem}
+.field .in .suf{color:var(--faint);font-size:.82rem;white-space:nowrap}
 .field input,.field textarea,.field select{background:transparent;border:0;outline:0;padding:13px 0;font-size:1rem}
+.field select{cursor:pointer}
 .field textarea{min-height:64px;resize:vertical;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg2)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
@@ -118,12 +124,49 @@ svg.line{display:block;width:100%;height:150px;overflow:visible}
 .btn.sm{padding:11px;font-size:.9rem;border-radius:13px}
 .btnrow{display:flex;gap:10px;margin-top:16px}
 
-.live{background:var(--bg2);border:1px dashed var(--line2);border-radius:var(--radius-sm);padding:15px;margin-top:6px}
-.live .lt{color:var(--muted);font-size:.8rem;margin-bottom:10px}
+/* toggle inline (2 modos) */
+.modes{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:10px}
+.modes button{flex:1;padding:8px;border-radius:9px;font-size:.8rem;font-weight:650;color:var(--muted)}
+.modes button.on{background:var(--card2);color:var(--text);border:1px solid var(--line2)}
+
+/* timer */
+.timer{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.timer .disp{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.01em;flex:1}
+.timer .disp.run{color:var(--accent)}
+.timer button{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--card2);border:1px solid var(--line2);color:var(--text)}
+.timer button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.timer button.go{background:var(--accent);color:#12220a;border:0}
+.timer button.go svg{stroke:#12220a}
+
+/* expense list */
+.exp{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.exp:first-of-type{border-top:0}
+.exp .mid{flex:1;min-width:0}
+.exp .mid .t{font-weight:650;font-size:.92rem}
+.exp .mid .s{color:var(--muted);font-size:.75rem;margin-top:2px}
+.exp .val{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.exp .del{color:var(--faint);width:30px;height:30px;display:flex;align-items:center;justify-content:center}
+.exp .del svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chip{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:999px;margin-right:6px}
+.chip.vida{background:rgba(138,160,255,.16);color:var(--blue)}
+.chip.corr{background:rgba(240,200,107,.16);color:var(--amber)}
+
+/* suggestion levels */
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.level{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:11px 9px;text-align:center;transition:.15s}
+.level.on{border-color:var(--accent);background:rgba(182,240,74,.07)}
+.level .lv{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.level .pv{font-size:1.05rem;font-weight:800;margin-top:3px}
+.level .dc{font-size:.68rem;color:var(--faint);margin-top:2px}
 
 /* empty */
 .empty{text-align:center;color:var(--muted);padding:34px 10px;font-size:.9rem}
 .empty svg{width:40px;height:40px;stroke:var(--faint);fill:none;stroke-width:1.6;margin-bottom:12px}
+
+/* tooltip */
+.info{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
+  background:var(--card2);border:1px solid var(--line2);color:var(--muted);font-size:.68rem;font-weight:800;cursor:pointer;flex-shrink:0}
+.info:active{background:var(--accent);color:#12220a}
 
 /* tabbar */
 .tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));
@@ -143,7 +186,7 @@ svg.line{display:block;width:100%;height:150px;overflow:visible}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:46;background:var(--card);
   border-top-left-radius:26px;border-top-right-radius:26px;border-top:1px solid var(--line2);
   padding:10px 16px calc(20px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .26s cubic-bezier(.4,1.2,.5,1);
-  max-width:520px;margin:0 auto}
+  max-width:520px;margin:0 auto;max-height:82vh;overflow-y:auto}
 .sheet.open{transform:translateY(0)}
 .sheet .grab{width:38px;height:4px;border-radius:999px;background:var(--line2);margin:8px auto 14px}
 .sheet-item{display:flex;align-items:center;gap:14px;width:100%;padding:15px 8px;border-radius:14px;font-size:1rem;font-weight:650;text-align:left}
@@ -153,17 +196,21 @@ svg.line{display:block;width:100%;height:150px;overflow:visible}
 .sheet-item .chev svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .sheet-item.on{background:var(--card2)}
 .sheet-item:active{background:var(--card2)}
+.sheet h4{margin:4px 8px 10px;font-size:1.05rem}
+.sheet p{margin:0 8px 12px;color:var(--muted);font-size:.88rem;line-height:1.5}
+.sheet .close{width:100%;margin-top:8px}
 
 /* toast */
 .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(96px + env(safe-area-inset-bottom));
   z-index:60;background:var(--accent);color:#12220a;font-weight:700;font-size:.9rem;padding:12px 20px;border-radius:14px;
-  box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;transition:.25s;pointer-events:none}
+  box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 .fadein{animation:fade .3s ease}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-@media(max-width:360px){ .balance .amt{font-size:2.3rem} }
+.hintbox{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:10px}
+.hintbox b{color:var(--text)}
+@media(max-width:360px){ .balance .amt{font-size:2.3rem} .levels{gap:6px} .level{padding:9px 5px} }
 </style>
 </head>
 <body>
@@ -180,42 +227,129 @@ const STORAGE_KEY = "ganhos_corridas_juarez_v1";
 /* ---------- helpers ---------- */
 const num = v => { const n = parseFloat(String(v).replace(',', '.')); return isNaN(n) ? 0 : n; };
 const brl = v => (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const brlParts = v => {
-  const s = brl(v);
-  const i = s.lastIndexOf(',');
-  return i>=0 ? [s.slice(0,i), s.slice(i)] : [s, ''];
-};
+const brl3 = v => "R$ " + (v||0).toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3});
+const brlParts = v => { const s = brl(v); const i = s.lastIndexOf(','); return i>=0 ? [s.slice(0,i), s.slice(i)] : [s, '']; };
 const n1 = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
 const n2 = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtDate = iso => { if(!iso) return "—"; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; };
 const fmtShort = iso => { if(!iso) return ""; const [,m,d]=iso.split('-'); const mm=["","jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"]; return `${d}/${mm[parseInt(m,10)]}`; };
 const todayISO = () => new Date().toISOString().slice(0,10);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const ym = iso => (iso||"").slice(0,7);
 
-const defaultState = { periodos:[], custos:{depreciacao:0,manutencao:0,seguro:0,outros:0} };
+/* ---------- estado / retrocompat ---------- */
+const defaultCustos = { depreciacao:0, manutencao:0, seguro:0, outros:0, seguroModo:"km", seguroMensal:0, kmMes:0 };
+const defaultState = { periodos:[], custos:{...defaultCustos}, despesas:[] };
 function loadState(){
   try{
     const s = localStorage.getItem(STORAGE_KEY);
     if(s){ const p = JSON.parse(s);
-      return { periodos: Array.isArray(p.periodos)?p.periodos:[], custos: Object.assign({}, defaultState.custos, p.custos||{}) };
+      return {
+        periodos: Array.isArray(p.periodos)?p.periodos:[],
+        custos: Object.assign({}, defaultCustos, p.custos||{}),
+        despesas: Array.isArray(p.despesas)?p.despesas:[]
+      };
     }
   }catch(e){}
   return JSON.parse(JSON.stringify(defaultState));
 }
-function custoExtraKm(c){ return num(c.depreciacao)+num(c.manutencao)+num(c.seguro)+num(c.outros); }
 
-function calcular(p, custos){
+/* km/mês estimado pelo histórico (média mensal), usado quando kmMes não é informado */
+function kmMesEstimado(periodos){
+  if(!periodos || !periodos.length) return 0;
+  const meses = {};
+  let semData = 0, kmSemData = 0;
+  periodos.forEach(p=>{
+    const k = num(p.km);
+    if(p.data){ meses[ym(p.data)] = (meses[ym(p.data)]||0) + k; }
+    else { semData++; kmSemData += k; }
+  });
+  const chaves = Object.keys(meses);
+  if(chaves.length){ const total = chaves.reduce((a,m)=>a+meses[m],0); return total/chaves.length; }
+  return kmSemData; // fallback improvável
+}
+
+/* R$/km das despesas: vida útil (valor/vidaKm) + correntes (total do mês / km do mês, média) */
+function despesasPorKm(despesas, kmMesRef){
+  if(!despesas || !despesas.length) return { vidaUtil:0, corrente:0, total:0 };
+  let vidaUtil = 0;
+  const correntesPorMes = {}; let correnteSemMes = 0;
+  despesas.forEach(d=>{
+    if(d.tipo === "vidautil"){
+      const vk = num(d.vidaKm);
+      if(vk>0) vidaUtil += num(d.valor)/vk;
+    } else {
+      const key = d.data ? ym(d.data) : "_";
+      if(key==="_") correnteSemMes += num(d.valor);
+      else correntesPorMes[key] = (correntesPorMes[key]||0) + num(d.valor);
+    }
+  });
+  // correntes: para cada mês, gasto do mês / kmMesRef; média entre meses
+  const chaves = Object.keys(correntesPorMes);
+  let corrente = 0;
+  if(kmMesRef>0){
+    if(chaves.length){
+      const soma = chaves.reduce((a,m)=>a + (correntesPorMes[m]/kmMesRef), 0);
+      corrente += soma/chaves.length;
+    }
+    if(correnteSemMes>0) corrente += correnteSemMes/kmMesRef;
+  }
+  return { vidaUtil, corrente, total: vidaUtil+corrente };
+}
+
+/* seguro em R$/km (direto ou mensal convertido) */
+function seguroPorKm(custos, kmMesRef){
+  if(custos.seguroModo === "mensal"){
+    return kmMesRef>0 ? num(custos.seguroMensal)/kmMesRef : 0;
+  }
+  return num(custos.seguro);
+}
+
+/* custo total por km, considerando tudo */
+function custoExtraKm(custos, despesas, periodos){
+  const kmMesRef = num(custos.kmMes) > 0 ? num(custos.kmMes) : kmMesEstimado(periodos);
+  const dep = num(custos.depreciacao);
+  const man = num(custos.manutencao);
+  const out = num(custos.outros);
+  const seg = seguroPorKm(custos, kmMesRef);
+  const desp = despesasPorKm(despesas, kmMesRef).total;
+  return dep + man + out + seg + desp;
+}
+/* detalhamento para exibição */
+function custoBreakdown(custos, despesas, periodos){
+  const kmMesRef = num(custos.kmMes) > 0 ? num(custos.kmMes) : kmMesEstimado(periodos);
+  const desp = despesasPorKm(despesas, kmMesRef);
+  return {
+    kmMesRef,
+    depreciacao: num(custos.depreciacao),
+    manutencao: num(custos.manutencao),
+    outros: num(custos.outros),
+    seguro: seguroPorKm(custos, kmMesRef),
+    despVida: desp.vidaUtil,
+    despCorrente: desp.corrente,
+    total: num(custos.depreciacao)+num(custos.manutencao)+num(custos.outros)+seguroPorKm(custos,kmMesRef)+desp.total
+  };
+}
+
+function calcular(p, custoKm){
   const km=num(p.km), consumo=num(p.consumo), preco=num(p.preco), faturamento=num(p.faturamento), horas=num(p.horas);
   const litros = consumo>0 ? km/consumo : 0;
   const gasto = litros*preco;
   const saldo = faturamento - gasto;
-  const extras = custoExtraKm(custos)*km;
+  const extras = (custoKm||0)*km;
   const liquido = saldo - extras;
   return { km,consumo,preco,faturamento,horas,litros,gasto,saldo,extras,liquido,
     rHora: horas>0?faturamento/horas:0, rHoraLiq: horas>0?liquido/horas:0,
     rKm: km>0?faturamento/km:0, rKmLiq: km>0?liquido/km:0,
     margem: faturamento>0?(saldo/faturamento)*100:0 };
 }
+
+/* níveis de depreciação sugeridos (base: carro popular ~R$80mil, ~30 mil km/ano) */
+const DEP_LEVELS = [
+  { key:"baixo", lv:"Conservador", val:0.20, dc:"~10%/ano" },
+  { key:"medio", lv:"Moderado", val:0.35, dc:"~15%/ano" },
+  { key:"alto", lv:"Alto", val:0.50, dc:"~20%/ano" },
+];
 
 /* ---------- icons ---------- */
 const I = {
@@ -230,12 +364,22 @@ const I = {
   fuel: <svg viewBox="0 0 24 24"><rect x="4" y="4" width="9" height="16" rx="2"/><path d="M13 9h3a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3"/><line x1="4" y1="10" x2="13" y2="10"/></svg>,
   trend: <svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>,
   chev: <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>,
-  back: <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>,
   chart: <svg viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M7 14l3-3 3 3 4-5"/></svg>,
+  play: <svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>,
+  pause: <svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>,
+  reset: <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>,
+  trash: <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>,
+  shield: <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>,
+  tools: <svg viewBox="0 0 24 24"><path d="M14 7a4 4 0 0 1 5 5l-9 9-3-3 9-9a4 4 0 0 1-2-2z"/><path d="M6 21l-3-3"/></svg>,
 };
 
-/* ---------- Smooth line chart ---------- */
-function LineChart({ data, fmt }){
+/* ---------- Tooltip ---------- */
+function Info({onOpen, text}){
+  return <span className="info" role="button" aria-label="Informação" onClick={e=>{e.stopPropagation(); onOpen(text);}}>i</span>;
+}
+
+/* ---------- Line chart ---------- */
+function LineChart({ data }){
   const W=100, H=150, pad=10;
   if(!data.length) return <div className="empty">{I.chart}<div>Sem dados ainda</div></div>;
   const vals = data.map(d=>d.v);
@@ -245,7 +389,6 @@ function LineChart({ data, fmt }){
   const X = i => n===1 ? W/2 : pad + (i/(n-1))*(W-2*pad);
   const Y = v => (H-20) - ((v-min)/range)*(H-40);
   const pts = data.map((d,i)=>[X(i),Y(d.v)]);
-  // catmull-rom -> bezier smoothing
   let dPath = `M ${pts[0][0]} ${pts[0][1]}`;
   for(let i=0;i<pts.length-1;i++){
     const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
@@ -258,12 +401,10 @@ function LineChart({ data, fmt }){
   return (
     <div>
       <svg className="line" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.28"/>
-            <stop offset="100%" stopColor="var(--accent)" stopOpacity="0"/>
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.28"/>
+          <stop offset="100%" stopColor="var(--accent)" stopOpacity="0"/>
+        </linearGradient></defs>
         <path d={area} fill="url(#g1)" />
         <path d={dPath} fill="none" stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>
         <circle cx={last[0]} cy={last[1]} r="3.4" fill="var(--accent)" stroke="var(--bg)" strokeWidth="2" vectorEffect="non-scaling-stroke"/>
@@ -276,120 +417,76 @@ function LineChart({ data, fmt }){
 }
 
 /* ---------- Field ---------- */
-function Field({label, value, onChange, placeholder, pre, type="number", area}){
-  if(area) return (
-    <div className="field">
-      <label>{label}</label>
-      <textarea value={value} placeholder={placeholder} onChange={e=>onChange(e.target.value)} />
-    </div>
-  );
+function Field({label, value, onChange, placeholder, pre, suf, type="number", area, info, onInfo}){
+  const lab = <label>{label}{info && <Info onOpen={onInfo} text={info}/>}</label>;
+  if(area) return (<div className="field">{lab}<textarea value={value} placeholder={placeholder} onChange={e=>onChange(e.target.value)} /></div>);
   return (
-    <div className="field">
-      <label>{label}</label>
+    <div className="field">{lab}
       <div className="in">
         {pre && <span className="pre">{pre}</span>}
-        <input type={type} inputMode={type==="number"?"decimal":undefined} step="0.01"
-          value={value} placeholder={placeholder} onChange={e=>onChange(e.target.value)} />
+        <input type={type} inputMode={type==="number"?"decimal":undefined} step="0.01" value={value} placeholder={placeholder} onChange={e=>onChange(e.target.value)} />
+        {suf && <span className="suf">{suf}</span>}
       </div>
     </div>
   );
 }
 
-/* ---------- Dashboard ---------- */
-function Dashboard({periodos, custos, go}){
-  const ord = useMemo(()=>[...periodos].sort((a,b)=>(a.data||"").localeCompare(b.data||"")||(a.id||"").localeCompare(b.id||"")), [periodos]);
-  const [modo,setModo] = useState("liquido"); // liquido | saldo | fat
-  const totais = ord.reduce((a,p)=>{ const c=calcular(p,custos); a.fat+=c.faturamento;a.saldo+=c.saldo;a.liq+=c.liquido;a.km+=c.km;a.horas+=c.horas;a.gas+=c.gasto; return a; },{fat:0,saldo:0,liq:0,km:0,horas:0,gas:0});
-  const last = ord[ord.length-1];
-  const lc = last ? calcular(last,custos) : null;
-
-  const chartVal = p => { const c=calcular(p,custos); return modo==="fat"?c.faturamento:modo==="saldo"?c.saldo:c.liquido; };
-  const chartData = ord.slice(-8).map(p=>({v:chartVal(p), label:fmtShort(p.data)}));
-  const chartTotal = modo==="fat"?totais.fat:modo==="saldo"?totais.saldo:totais.liq;
-  const [ip,ic] = brlParts(lc?lc.liquido:0);
-
-  if(!ord.length) return (
-    <div className="fadein">
-      <div className="empty" style={{marginTop:40}}>
-        {I.car}
-        <div style={{fontWeight:700,color:"var(--text)",marginBottom:6}}>Nenhum período ainda</div>
-        <div>Toque em <b style={{color:"var(--accent)"}}>Registrar</b> para adicionar seu primeiro período de corridas.</div>
-        <div style={{marginTop:18}}><button className="btn" style={{maxWidth:200,margin:"0 auto"}} onClick={()=>go("registrar")}>{I.plus} Registrar agora</button></div>
-      </div>
-    </div>
-  );
-
+/* ---------- Timer (cronômetro) ---------- */
+function Timer({onApply, onInfo}){
+  const [running,setRunning] = useState(false);
+  const [elapsed,setElapsed] = useState(0); // segundos
+  const startRef = useRef(0);
+  const rafRef = useRef(null);
+  useEffect(()=>{
+    if(running){
+      startRef.current = Date.now() - elapsed*1000;
+      const tick = ()=>{ setElapsed((Date.now()-startRef.current)/1000); rafRef.current=setTimeout(tick,1000); };
+      rafRef.current = setTimeout(tick,1000);
+      return ()=>clearTimeout(rafRef.current);
+    }
+  }, [running]);
+  const hh = Math.floor(elapsed/3600), mm = Math.floor((elapsed%3600)/60), ss = Math.floor(elapsed%60);
+  const disp = `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+  const horasDecimais = (elapsed/3600);
   return (
-    <div className="fadein">
-      <div className="balance">
-        <div className="lbl">Líquido do último período</div>
-        <div className="amt">{ip}<span className="cents">{ic}</span></div>
-        <div className="sub">
-          <span className={"tag "+(lc.liquido>=0?"up":"down")}>{lc.liquido>=0?"▲":"▼"} {n1(lc.margem)}% saldo</span>
-          {fmtDate(last.data)} · {n1(lc.km)} km · {n1(lc.horas)} h
-        </div>
+    <div>
+      <div className="field"><label>Cronômetro de trabalho <Info onOpen={onInfo} text="cronometro"/></label></div>
+      <div className="timer">
+        <span className={"disp"+(running?" run":"")}>{disp}</span>
+        <button className={running?"":"go"} onClick={()=>setRunning(r=>!r)} aria-label={running?"Pausar":"Iniciar"}>{running?I.pause:I.play}</button>
+        <button onClick={()=>{ setRunning(false); setElapsed(0); }} aria-label="Zerar">{I.reset}</button>
       </div>
-
-      <div className="seg" style={{marginTop:18}}>
-        {[["liquido","Líquido"],["saldo","Saldo"],["fat","Faturamento"]].map(([k,l])=>(
-          <button key={k} className={modo===k?"on":""} onClick={()=>setModo(k)}>{l}</button>
-        ))}
-      </div>
-
-      <div className="card">
-        <div className="chart-head">
-          <div>
-            <div className="k">Total acumulado</div>
-            <div className="big">{brl(chartTotal)}</div>
-          </div>
-          <div className="k">{ord.length} período{ord.length>1?"s":""}</div>
+      {elapsed>0 && (
+        <div className="btnrow" style={{marginTop:0,marginBottom:10}}>
+          <button className="btn ghost sm" onClick={()=>{ setRunning(false); onApply(horasDecimais.toFixed(2)); }}>Usar {n2(horasDecimais)} h no registro</button>
         </div>
-        <LineChart data={chartData} />
-      </div>
-
-      <div className="section-title"><h2>Resumo</h2></div>
-      <div className="stats2">
-        <div className="stat">
-          <div className="ic green">{I.wallet}</div>
-          <div className="v">{brl(totais.fat)}</div>
-          <div className="k">Faturamento total</div>
-        </div>
-        <div className="stat">
-          <div className="ic amber">{I.fuel}</div>
-          <div className="v">{brl(totais.gas)}</div>
-          <div className="k">Gasto com gasolina</div>
-        </div>
-        <div className="stat">
-          <div className="ic violet">{I.trend}</div>
-          <div className="v">{totais.horas?brl(totais.liq/totais.horas):"—"}</div>
-          <div className="k">R$/hora líquido</div>
-        </div>
-        <div className="stat">
-          <div className="ic blue">{I.car}</div>
-          <div className="v">{n1(totais.km)}</div>
-          <div className="k">KM totais</div>
-        </div>
-      </div>
-
-      <div className="card" style={{marginTop:14}}>
-        <h3>Ganho líquido estimado</h3>
-        <div className="mrow"><span className="k">Líquido total</span><span className={"v "+(totais.liq>=0?"good":"bad")}>{brl(totais.liq)}</span></div>
-        <div className="mrow"><span className="k">Saldo total (só combustível)</span><span className="v">{brl(totais.saldo)}</span></div>
-        <div className="mrow"><span className="k">Custo extra por km</span><span className="v">{brl(custoExtraKm(custos))}</span></div>
-        <div className="mrow"><span className="k">R$/km líquido</span><span className="v">{totais.km?brl(totais.liq/totais.km):"—"}</span></div>
-      </div>
+      )}
     </div>
   );
 }
 
 /* ---------- Registrar ---------- */
-const emptyForm = () => ({data:todayISO(),faturamento:"",horas:"",km:"",consumo:"",preco:"",corridas:"",obs:""});
-function Registrar({custos, onSave, editing, onCancel}){
+const emptyForm = () => ({data:todayISO(),faturamento:"",horas:"",km:"",kmIni:"",kmFim:"",consumo:"",preco:"",corridas:"",obs:""});
+function Registrar({custoKm, onSave, editing, onCancel, onInfo}){
   const [f,setF] = useState(editing || emptyForm());
-  useEffect(()=>{ setF(editing || emptyForm()); }, [editing]);
+  const [horasModo,setHorasModo] = useState("manual"); // manual | timer
+  const [kmModo,setKmModo] = useState(editing && (editing.kmIni||editing.kmFim) ? "intervalo" : "direto");
+  useEffect(()=>{ setF(editing || emptyForm()); setKmModo(editing && (editing.kmIni||editing.kmFim) ? "intervalo":"direto"); }, [editing]);
   const set = (k,v)=>setF(s=>({...s,[k]:v}));
-  const c = calcular(f, custos);
-  const filled = num(f.faturamento)>0 || num(f.km)>0;
+
+  // km derivado do intervalo
+  const kmIntervalo = Math.max(0, num(f.kmFim)-num(f.kmIni));
+  const kmEfetivo = kmModo==="intervalo" ? kmIntervalo : num(f.km);
+  const formCalc = {...f, km:kmEfetivo};
+  const c = calcular(formCalc, custoKm);
+  const filled = num(f.faturamento)>0 || kmEfetivo>0;
+
+  const doSave = ()=>{
+    const out = {...f};
+    if(kmModo==="intervalo"){ out.km = kmIntervalo ? String(kmIntervalo) : ""; }
+    else { out.kmIni=""; out.kmFim=""; }
+    onSave(out);
+  };
 
   return (
     <div className="fadein">
@@ -401,14 +498,39 @@ function Registrar({custos, onSave, editing, onCancel}){
           <label>Data</label>
           <div className="in"><input type="date" value={f.data} onChange={e=>set("data",e.target.value)} /></div>
         </div>
-        <Field label="Faturamento" pre="R$" value={f.faturamento} onChange={v=>set("faturamento",v)} placeholder="188,75" />
-        <div className="grid2">
-          <Field label="Horas" value={f.horas} onChange={v=>set("horas",v)} placeholder="5,5" />
-          <Field label="KM rodados" value={f.km} onChange={v=>set("km",v)} placeholder="86,9" />
+
+        <Field label="Faturamento" pre="R$" info="faturamento" onInfo={onInfo} value={f.faturamento} onChange={v=>set("faturamento",v)} placeholder="188,75" />
+
+        {/* HORAS: manual ou cronômetro */}
+        <div className="field" style={{marginBottom:8}}><label>Horas trabalhadas <Info onOpen={onInfo} text="horas"/></label></div>
+        <div className="modes">
+          <button className={horasModo==="manual"?"on":""} onClick={()=>setHorasModo("manual")}>Digitar</button>
+          <button className={horasModo==="timer"?"on":""} onClick={()=>setHorasModo("timer")}>Cronômetro</button>
         </div>
-        <div className="grid2">
-          <Field label="Consumo (km/L)" value={f.consumo} onChange={v=>set("consumo",v)} placeholder="10,0" />
-          <Field label="Combustível (R$/L)" pre="R$" value={f.preco} onChange={v=>set("preco",v)} placeholder="7,00" />
+        {horasModo==="manual"
+          ? <Field label="" suf="horas" value={f.horas} onChange={v=>set("horas",v)} placeholder="5,5" />
+          : <Timer onApply={h=>{ set("horas",h); setHorasModo("manual"); }} onInfo={onInfo} />}
+        {horasModo==="timer" && f.horas && <div className="hintbox">Valor atual no registro: <b>{n2(num(f.horas))} h</b></div>}
+
+        {/* KM: intervalo ou direto */}
+        <div className="field" style={{marginTop:14,marginBottom:8}}><label>KM rodados <Info onOpen={onInfo} text="km"/></label></div>
+        <div className="modes">
+          <button className={kmModo==="direto"?"on":""} onClick={()=>setKmModo("direto")}>Total direto</button>
+          <button className={kmModo==="intervalo"?"on":""} onClick={()=>setKmModo("intervalo")}>Início e fim</button>
+        </div>
+        {kmModo==="direto"
+          ? <Field label="" suf="km" value={f.km} onChange={v=>set("km",v)} placeholder="86,9" />
+          : (<div>
+              <div className="grid2">
+                <Field label="Odômetro início" suf="km" value={f.kmIni} onChange={v=>set("kmIni",v)} placeholder="45210" />
+                <Field label="Odômetro fim" suf="km" value={f.kmFim} onChange={v=>set("kmFim",v)} placeholder="45297" />
+              </div>
+              <div className="hintbox">Rodado no período: <b>{n1(kmIntervalo)} km</b></div>
+            </div>)}
+
+        <div className="grid2" style={{marginTop:14}}>
+          <Field label="Consumo" suf="km/L" info="consumo" onInfo={onInfo} value={f.consumo} onChange={v=>set("consumo",v)} placeholder="10,0" />
+          <Field label="Combustível" pre="R$" suf="/L" info="preco" onInfo={onInfo} value={f.preco} onChange={v=>set("preco",v)} placeholder="7,00" />
         </div>
         <Field label="Corridas (opcional)" value={f.corridas} onChange={v=>set("corridas",v)} placeholder="12" />
         <Field label="Observações (opcional)" area value={f.obs} onChange={v=>set("obs",v)} placeholder="Chuva, região, plataforma..." />
@@ -418,22 +540,21 @@ function Registrar({custos, onSave, editing, onCancel}){
         <div className="card" style={{marginTop:14}}>
           <h3>Prévia</h3>
           <div className="mrow"><span className="k">Gasto gasolina</span><span className="v">{brl(c.gasto)} · {n2(c.litros)} L</span></div>
-          <div className="mrow"><span className="k">Saldo</span><span className={"v "+(c.saldo>=0?"good":"bad")}>{brl(c.saldo)}</span></div>
-          <div className="mrow"><span className="k">Líquido estimado</span><span className={"v "+(c.liquido>=0?"good":"bad")}>{brl(c.liquido)}</span></div>
+          <div className="mrow"><span className="k">Saldo (fat. − gasolina)</span><span className={"v "+(c.saldo>=0?"good":"bad")}>{brl(c.saldo)}</span></div>
+          <div className="mrow"><span className="k">Outros custos ({brl3(custoKm)}/km)</span><span className="v">−{brl(c.extras)}</span></div>
+          <div className="mrow total"><span className="k">Líquido estimado</span><span className={"v "+(c.liquido>=0?"good":"bad")}>{brl(c.liquido)}</span></div>
           <div className="mrow"><span className="k">R$/hora · R$/km</span><span className="v">{c.rHora?brl(c.rHora):"—"} · {c.rKm?brl(c.rKm):"—"}</span></div>
         </div>
       )}
 
-      <div className="btnrow">
-        <button className="btn" onClick={()=>onSave(f)}>{I.plus} {editing?"Salvar alterações":"Salvar período"}</button>
-      </div>
-      {!editing && <div className="btnrow"><button className="btn ghost sm" onClick={()=>setF({...emptyForm(),faturamento:"188.75",horas:"5.5",km:"86.9",consumo:"10",preco:"7"})}>Preencher exemplo</button></div>}
+      <div className="btnrow"><button className="btn" onClick={doSave}>{I.plus} {editing?"Salvar alterações":"Salvar período"}</button></div>
+      {!editing && <div className="btnrow"><button className="btn ghost sm" onClick={()=>{ setKmModo("direto"); setF({...emptyForm(),faturamento:"188.75",horas:"5.5",km:"86.9",consumo:"10",preco:"7"}); }}>Preencher exemplo</button></div>}
     </div>
   );
 }
 
 /* ---------- Historico ---------- */
-function Historico({periodos, custos, onEdit, onDelete}){
+function Historico({periodos, custoKm, onEdit}){
   const ord = useMemo(()=>[...periodos].sort((a,b)=>(b.data||"").localeCompare(a.data||"")||(b.id||"").localeCompare(a.id||"")), [periodos]);
   if(!ord.length) return <div className="empty" style={{marginTop:40}}>{I.clock}<div>Nenhum período registrado.</div></div>;
   return (
@@ -441,7 +562,7 @@ function Historico({periodos, custos, onEdit, onDelete}){
       <div className="section-title"><h2>Histórico</h2><span className="link">{ord.length} registros</span></div>
       <div className="card">
         {ord.map(p=>{
-          const c = calcular(p,custos);
+          const c = calcular(p,custoKm);
           return (
             <div className="hist" key={p.id} onClick={()=>onEdit(p)}>
               <div className="av">{I.car}</div>
@@ -450,8 +571,7 @@ function Historico({periodos, custos, onEdit, onDelete}){
                 <div className="s">{n1(c.km)} km · {n1(c.horas)} h · gasolina {brl(c.gasto)}{num(p.corridas)?` · ${num(p.corridas)} corridas`:""}</div>
               </div>
               <div className="amt" style={{color:c.liquido>=0?"var(--accent)":"var(--red)"}}>
-                {brl(c.liquido)}
-                <small>{c.rHora?brl(c.rHora)+"/h":""}</small>
+                {brl(c.liquido)}<small>{c.rHora?brl(c.rHora)+"/h":""}</small>
               </div>
             </div>
           );
@@ -463,27 +583,147 @@ function Historico({periodos, custos, onEdit, onDelete}){
 }
 
 /* ---------- Custos ---------- */
-function Custos({custos, onSave}){
+function Custos({custos, despesas, periodos, onSaveCustos, onAddDespesa, onDelDespesa, onInfo}){
   const [c,setC] = useState(custos);
   useEffect(()=>setC(custos),[custos]);
   const set=(k,v)=>setC(s=>({...s,[k]:v}));
-  const total = custoExtraKm(c);
+
+  // calculadora depreciação
+  const [calc,setCalc] = useState({valor:"", perc:"15", kmAno:"30000"});
+  const depCalc = num(calc.kmAno)>0 ? (num(calc.valor)*(num(calc.perc)/100))/num(calc.kmAno) : 0;
+
+  // nova despesa
+  const [nd,setNd] = useState({data:todayISO(), descricao:"", valor:"", tipo:"vidautil", vidaKm:""});
+  const setNdF=(k,v)=>setNd(s=>({...s,[k]:v}));
+  const addDespesa = ()=>{
+    if(!nd.descricao.trim() || num(nd.valor)<=0){ return; }
+    onAddDespesa({...nd, id:uid(), valor:num(nd.valor), vidaKm:num(nd.vidaKm)});
+    setNd({data:todayISO(), descricao:"", valor:"", tipo:"vidautil", vidaKm:""});
+  };
+
+  const bk = custoBreakdown(c, despesas, periodos);
+  const kmMesInfo = num(c.kmMes)>0 ? "informado" : "estimado pelo histórico";
+
+  const nivelAtivo = DEP_LEVELS.find(l=>Math.abs(l.val-num(c.depreciacao))<0.001);
+
   return (
     <div className="fadein">
-      <div className="section-title"><h2>Custos por km</h2></div>
+      <div className="section-title"><h2>Custos e despesas</h2></div>
+
+      {/* KM por mês */}
       <div className="card">
-        <p style={{margin:"0 0 16px",color:"var(--muted)",fontSize:".88rem"}}>Além do combustível, informe quanto gasta por km. Isso é descontado para estimar o ganho líquido. Deixe zero se não quiser considerar.</p>
-        <div className="grid2">
-          <Field label="Depreciação (R$/km)" pre="R$" value={c.depreciacao} onChange={v=>set("depreciacao",v)} placeholder="0,15" />
-          <Field label="Manutenção (R$/km)" pre="R$" value={c.manutencao} onChange={v=>set("manutencao",v)} placeholder="0,10" />
+        <h3>{I.car} KM por mês <Info onOpen={onInfo} text="kmmes"/></h3>
+        <p style={{margin:"0 0 14px",color:"var(--muted)",fontSize:".86rem"}}>Usado para converter custos mensais (seguro) e gastos correntes em R$/km. Deixe vazio para o app estimar pela sua média.</p>
+        <Field label="KM rodados por mês" suf="km/mês" value={c.kmMes||""} onChange={v=>set("kmMes",v)} placeholder="ex: 3000" />
+        <div className="hintbox">Referência atual: <b>{n1(bk.kmMesRef)} km/mês</b> ({kmMesInfo}).</div>
+      </div>
+
+      {/* Depreciação */}
+      <div className="card">
+        <h3>{I.trend} Depreciação <Info onOpen={onInfo} text="depreciacao"/></h3>
+        <p style={{margin:"0 0 6px",color:"var(--muted)",fontSize:".86rem"}}>Quanto o carro perde de valor por km rodado. Escolha um nível ou calcule o seu.</p>
+        <div className="levels">
+          {DEP_LEVELS.map(l=>(
+            <div key={l.key} className={"level"+(nivelAtivo&&nivelAtivo.key===l.key?" on":"")} onClick={()=>set("depreciacao",l.val)}>
+              <div className="lv">{l.lv}</div>
+              <div className="pv">{brl(l.val)}</div>
+              <div className="dc">{l.dc}</div>
+            </div>
+          ))}
         </div>
+        <Field label="Depreciação usada (R$/km)" pre="R$" value={c.depreciacao} onChange={v=>set("depreciacao",v)} placeholder="0,35" />
+        <details style={{marginTop:4}}>
+          <summary style={{cursor:"pointer",color:"var(--accent)",fontSize:".85rem",fontWeight:600}}>Calcular pela minha realidade</summary>
+          <div style={{marginTop:12}}>
+            <Field label="Valor atual do carro" pre="R$" value={calc.valor} onChange={v=>setCalc(s=>({...s,valor:v}))} placeholder="80000" />
+            <div className="grid2">
+              <Field label="Perde por ano" suf="%" value={calc.perc} onChange={v=>setCalc(s=>({...s,perc:v}))} placeholder="15" />
+              <Field label="KM por ano" suf="km" value={calc.kmAno} onChange={v=>setCalc(s=>({...s,kmAno:v}))} placeholder="30000" />
+            </div>
+            <div className="hintbox">Depreciação calculada: <b>{brl3(depCalc)}/km</b>.
+              <div className="btnrow" style={{marginTop:10}}><button className="btn ghost sm" onClick={()=>set("depreciacao",Number(depCalc.toFixed(3)))}>Usar este valor</button></div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      {/* Seguro */}
+      <div className="card">
+        <h3>{I.shield} Seguro <Info onOpen={onInfo} text="seguro"/></h3>
+        <div className="modes">
+          <button className={c.seguroModo!=="mensal"?"on":""} onClick={()=>set("seguroModo","km")}>Valor por km</button>
+          <button className={c.seguroModo==="mensal"?"on":""} onClick={()=>set("seguroModo","mensal")}>Valor mensal</button>
+        </div>
+        {c.seguroModo==="mensal"
+          ? (<div>
+              <Field label="Seguro por mês" pre="R$" value={c.seguroMensal||""} onChange={v=>set("seguroMensal",v)} placeholder="220,00" />
+              <div className="hintbox">Equivale a <b>{brl3(bk.seguro)}/km</b> (÷ {n1(bk.kmMesRef)} km/mês).</div>
+            </div>)
+          : <Field label="Seguro por km" pre="R$" value={c.seguro} onChange={v=>set("seguro",v)} placeholder="0,05" />}
+      </div>
+
+      {/* Manutenção fixa por km (legado/simplificado) */}
+      <div className="card">
+        <h3>{I.tools} Manutenção e outros (fixo por km) <Info onOpen={onInfo} text="manutfixa"/></h3>
         <div className="grid2">
-          <Field label="Seguro (R$/km)" pre="R$" value={c.seguro} onChange={v=>set("seguro",v)} placeholder="0,05" />
+          <Field label="Manutenção (R$/km)" pre="R$" value={c.manutencao} onChange={v=>set("manutencao",v)} placeholder="0,10" />
           <Field label="Outros (R$/km)" pre="R$" value={c.outros} onChange={v=>set("outros",v)} placeholder="0,00" />
         </div>
-        <div className="mrow" style={{borderTop:"1px solid var(--line)",marginTop:6}}><span className="k">Total de custos extras</span><span className="v good">{brl(total)} / km</span></div>
+        <div className="hintbox">Prefere lançar gastos reais? Use o registro de despesas abaixo — o app calcula o R$/km sozinho.</div>
       </div>
-      <div className="btnrow"><button className="btn" onClick={()=>onSave(c)}>Salvar custos</button></div>
+
+      {/* Registro de despesas */}
+      <div className="card">
+        <h3>{I.wallet} Registro de despesas <Info onOpen={onInfo} text="despesas"/></h3>
+        <p style={{margin:"0 0 12px",color:"var(--muted)",fontSize:".86rem"}}>Lance gastos reais. O app soma e converte em R$/km automaticamente.</p>
+        <div className="field"><label>Data</label><div className="in"><input type="date" value={nd.data} onChange={e=>setNdF("data",e.target.value)} /></div></div>
+        <Field label="Descrição" type="text" value={nd.descricao} onChange={v=>setNdF("descricao",v)} placeholder="Pneu dianteiro / Lavagem / Óleo" />
+        <div className="grid2">
+          <Field label="Valor" pre="R$" value={nd.valor} onChange={v=>setNdF("valor",v)} placeholder="1200,00" />
+          <div className="field"><label>Tipo <Info onOpen={onInfo} text="tipodespesa"/></label>
+            <div className="in"><select value={nd.tipo} onChange={e=>setNdF("tipo",e.target.value)}>
+              <option value="vidautil">Item que dura (km)</option>
+              <option value="corrente">Gasto corrente</option>
+            </select></div>
+          </div>
+        </div>
+        {nd.tipo==="vidautil" && <Field label="Vida útil estimada" suf="km" info="vidautil" onInfo={onInfo} value={nd.vidaKm} onChange={v=>setNdF("vidaKm",v)} placeholder="40000" />}
+        <div className="btnrow" style={{marginTop:6}}><button className="btn sm" onClick={addDespesa}>{I.plus} Adicionar despesa</button></div>
+
+        {despesas.length>0 && (
+          <div style={{marginTop:16}}>
+            {[...despesas].sort((a,b)=>(b.data||"").localeCompare(a.data||"")).map(d=>{
+              const rkm = d.tipo==="vidautil" ? (num(d.vidaKm)>0?num(d.valor)/num(d.vidaKm):0) : 0;
+              return (
+                <div className="exp" key={d.id}>
+                  <div className="mid">
+                    <div className="t">{d.descricao||"—"}</div>
+                    <div className="s">
+                      <span className={"chip "+(d.tipo==="vidautil"?"vida":"corr")}>{d.tipo==="vidautil"?"por km":"corrente"}</span>
+                      {fmtDate(d.data)}{d.tipo==="vidautil"&&num(d.vidaKm)>0?` · ${n1(num(d.vidaKm))} km · ${brl3(rkm)}/km`:""}
+                    </div>
+                  </div>
+                  <div className="val">{brl(num(d.valor))}</div>
+                  <button className="del" onClick={()=>onDelDespesa(d.id)} aria-label="Excluir">{I.trash}</button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Resumo do custo por km */}
+      <div className="card">
+        <h3>Custo total por km</h3>
+        <div className="mrow"><span className="k">Depreciação</span><span className="v">{brl3(bk.depreciacao)}</span></div>
+        <div className="mrow"><span className="k">Seguro</span><span className="v">{brl3(bk.seguro)}</span></div>
+        <div className="mrow"><span className="k">Manutenção fixa + outros</span><span className="v">{brl3(bk.manutencao+bk.outros)}</span></div>
+        <div className="mrow"><span className="k">Despesas — itens por km</span><span className="v">{brl3(bk.despVida)}</span></div>
+        <div className="mrow"><span className="k">Despesas — correntes</span><span className="v">{brl3(bk.despCorrente)}</span></div>
+        <div className="mrow total"><span className="k">Total por km</span><span className="v good">{brl3(bk.total)}</span></div>
+      </div>
+
+      <div className="btnrow"><button className="btn" onClick={()=>onSaveCustos(c)}>Salvar custos</button></div>
     </div>
   );
 }
@@ -493,15 +733,15 @@ function baixar(nome,conteudo,tipo){
   const blob=new Blob([conteudo],{type:tipo}); const url=URL.createObjectURL(blob);
   const a=document.createElement("a"); a.href=url; a.download=nome; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
 }
-function Exportar({state, custos, onImport, onWipe}){
+function Exportar({state, custoKm, onImport, onWipe}){
   const fileRef = useRef();
   const exportJSON = ()=>baixar(`ganhos-corridas-backup-${todayISO()}.json`, JSON.stringify(state,null,2), "application/json");
   const exportMD = ()=>{
     const ord=[...state.periodos].sort((a,b)=>(a.data||"").localeCompare(b.data||""));
-    let md=`# Ganhos de corridas — Juarez\n\nGerado em ${new Date().toLocaleString('pt-BR')}\n\n`;
+    let md=`# Ganhos de corridas — Juarez\n\nGerado em ${new Date().toLocaleString('pt-BR')}\n\nCusto por km considerado: ${brl3(custoKm)}\n\n`;
     md+=`| Data | Fat. | Gasolina | Saldo | Líquido | R$/h | KM | Horas |\n|---|---|---|---|---|---|---|---|\n`;
     const t={fat:0,gas:0,saldo:0,liq:0,km:0,horas:0};
-    ord.forEach(p=>{const c=calcular(p,custos);t.fat+=c.faturamento;t.gas+=c.gasto;t.saldo+=c.saldo;t.liq+=c.liquido;t.km+=c.km;t.horas+=c.horas;
+    ord.forEach(p=>{const c=calcular(p,custoKm);t.fat+=c.faturamento;t.gas+=c.gasto;t.saldo+=c.saldo;t.liq+=c.liquido;t.km+=c.km;t.horas+=c.horas;
       md+=`| ${fmtDate(p.data)} | ${brl(c.faturamento)} | ${brl(c.gasto)} | ${brl(c.saldo)} | ${brl(c.liquido)} | ${c.rHora?brl(c.rHora):"—"} | ${n1(c.km)} | ${n1(c.horas)} |\n`;});
     md+=`| **Total** | **${brl(t.fat)}** | **${brl(t.gas)}** | **${brl(t.saldo)}** | **${brl(t.liq)}** | **${t.horas?brl(t.fat/t.horas):"—"}** | **${n1(t.km)}** | **${n1(t.horas)}** |\n`;
     baixar(`ganhos-corridas-${todayISO()}.md`, md, "text/markdown");
@@ -534,6 +774,87 @@ function Exportar({state, custos, onImport, onWipe}){
   );
 }
 
+/* ---------- Dashboard ---------- */
+function Dashboard({periodos, custoKm, breakdown, go}){
+  const ord = useMemo(()=>[...periodos].sort((a,b)=>(a.data||"").localeCompare(b.data||"")||(a.id||"").localeCompare(b.id||"")), [periodos]);
+  const [modo,setModo] = useState("liquido");
+  const totais = ord.reduce((a,p)=>{ const c=calcular(p,custoKm); a.fat+=c.faturamento;a.saldo+=c.saldo;a.liq+=c.liquido;a.km+=c.km;a.horas+=c.horas;a.gas+=c.gasto; return a; },{fat:0,saldo:0,liq:0,km:0,horas:0,gas:0});
+  const last = ord[ord.length-1];
+  const lc = last ? calcular(last,custoKm) : null;
+  const chartVal = p => { const c=calcular(p,custoKm); return modo==="fat"?c.faturamento:modo==="saldo"?c.saldo:c.liquido; };
+  const chartData = ord.slice(-8).map(p=>({v:chartVal(p), label:fmtShort(p.data)}));
+  const chartTotal = modo==="fat"?totais.fat:modo==="saldo"?totais.saldo:totais.liq;
+  const [ip,ic] = brlParts(lc?lc.liquido:0);
+
+  if(!ord.length) return (
+    <div className="fadein"><div className="empty" style={{marginTop:40}}>{I.car}
+      <div style={{fontWeight:700,color:"var(--text)",marginBottom:6}}>Nenhum período ainda</div>
+      <div>Toque em <b style={{color:"var(--accent)"}}>Registrar</b> para adicionar seu primeiro período.</div>
+      <div style={{marginTop:18}}><button className="btn" style={{maxWidth:200,margin:"0 auto"}} onClick={()=>go("registrar")}>{I.plus} Registrar agora</button></div>
+    </div></div>
+  );
+
+  return (
+    <div className="fadein">
+      <div className="balance">
+        <div className="lbl">Líquido do último período</div>
+        <div className="amt">{ip}<span className="cents">{ic}</span></div>
+        <div className="sub">
+          <span className={"tag "+(lc.liquido>=0?"up":"down")}>{lc.liquido>=0?"▲":"▼"} {n1(lc.margem)}% saldo</span>
+          {fmtDate(last.data)} · {n1(lc.km)} km · {n1(lc.horas)} h
+        </div>
+      </div>
+
+      <div className="seg" style={{marginTop:18}}>
+        {[["liquido","Líquido"],["saldo","Saldo"],["fat","Faturamento"]].map(([k,l])=>(
+          <button key={k} className={modo===k?"on":""} onClick={()=>setModo(k)}>{l}</button>
+        ))}
+      </div>
+
+      <div className="card">
+        <div className="chart-head">
+          <div><div className="k">Total acumulado</div><div className="big">{brl(chartTotal)}</div></div>
+          <div className="k">{ord.length} período{ord.length>1?"s":""}</div>
+        </div>
+        <LineChart data={chartData} />
+      </div>
+
+      <div className="section-title"><h2>Resumo</h2></div>
+      <div className="stats2">
+        <div className="stat"><div className="ic green">{I.wallet}</div><div className="v">{brl(totais.fat)}</div><div className="k">Faturamento total</div></div>
+        <div className="stat"><div className="ic amber">{I.fuel}</div><div className="v">{brl(totais.gas)}</div><div className="k">Gasto com gasolina</div></div>
+        <div className="stat"><div className="ic violet">{I.trend}</div><div className="v">{totais.horas?brl(totais.liq/totais.horas):"—"}</div><div className="k">R$/hora líquido</div></div>
+        <div className="stat"><div className="ic blue">{I.car}</div><div className="v">{n1(totais.km)}</div><div className="k">KM totais</div></div>
+      </div>
+
+      <div className="card" style={{marginTop:14}}>
+        <h3>Ganho líquido estimado</h3>
+        <div className="mrow"><span className="k">Líquido total</span><span className={"v "+(totais.liq>=0?"good":"bad")}>{brl(totais.liq)}</span></div>
+        <div className="mrow"><span className="k">Saldo total (só combustível)</span><span className="v">{brl(totais.saldo)}</span></div>
+        <div className="mrow"><span className="k">Custo total por km</span><span className="v">{brl3(custoKm)}</span></div>
+        <div className="mrow"><span className="k">R$/km líquido</span><span className="v">{totais.km?brl(totais.liq/totais.km):"—"}</span></div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- textos dos tooltips ---------- */
+const INFOS = {
+  faturamento: { t:"Faturamento", b:"É o valor bruto que a plataforma mostra que você ganhou no período. Atenção: isso NÃO é o seu lucro. É desse valor que saem combustível, custos do carro e as reservas do negócio." },
+  horas: { t:"Horas trabalhadas", b:"Tempo total conectado/rodando no período. Use o cronômetro para medir automaticamente, ou digite na mão se esqueceu de acionar. É a base do seu R$/hora — o indicador mais honesto de quanto seu tempo rende." },
+  cronometro: { t:"Cronômetro", b:"Toque em iniciar ao começar a rodar e pausar ao parar. Ele conta o tempo mesmo se você trocar de tela. Ao final, toque em 'Usar X h no registro' para preencher as horas. Se esquecer, é só digitar manualmente." },
+  km: { t:"KM rodados", b:"Distância total do período. 'Total direto': você digita os km. 'Início e fim': você informa o odômetro no começo e no fim, e o app calcula a diferença — útil para não errar e pegar inclusive o deslocamento sem passageiro." },
+  consumo: { t:"Consumo (km/L)", b:"Quantos km seu carro faz com 1 litro. Ex: 10 km/L. Se não souber, encha o tanque, zere o trip, rode e na próxima calibragem divida os km pelos litros abastecidos." },
+  preco: { t:"Preço do combustível", b:"Valor pago por litro no último abastecimento (R$/L). Mantenha atualizado, pois o preço muda bastante e afeta direto seu custo." },
+  kmmes: { t:"KM por mês", b:"Quantos km você roda em média por mês. Serve para converter custos mensais (como seguro) e gastos correntes em custo por km. Se deixar vazio, o app estima pela média dos seus registros e vai refinando conforme você usa." },
+  depreciacao: { t:"Depreciação", b:"É o custo invisível que mais engana o motorista: seu carro perde valor a cada km rodado. Guardar por conta disso evita o susto na hora de trocar de carro.\n\nBase das sugestões: carro popular de ~R$ 80 mil rodando ~30 mil km/ano. Conservador ~R$ 0,20/km (perde ~10%/ano), Moderado ~R$ 0,35/km (~15%/ano), Alto ~R$ 0,50/km (~20%/ano). Calculadoras de veículos no Brasil costumam usar ~20% ao ano como padrão. Ajuste ao seu carro na calculadora. (Valores de referência, não recomendação financeira.)" },
+  seguro: { t:"Seguro", b:"Você pode informar direto em R$/km, ou lançar o valor mensal e o app converte usando seus km/mês. Ex: seguro de R$ 220/mês ÷ 3.000 km = R$ 0,073/km." },
+  manutfixa: { t:"Manutenção fixa por km", b:"Uma forma simples: um valor médio por km para manutenção e outros itens. Se preferir precisão, deixe zero aqui e use o 'Registro de despesas' para lançar os gastos reais." },
+  despesas: { t:"Registro de despesas", b:"Lance seus gastos reais. O app soma tudo e transforma em R$/km automaticamente. Existem dois tipos, escolhidos em cada lançamento." },
+  tipodespesa: { t:"Tipo de despesa", b:"'Item que dura (km)': pneu, óleo, correia — coisas que duram uma quilometragem. O custo é diluído pela vida útil.\n\n'Gasto corrente': lavagem, pedágio, lanche — não têm vida útil em km. O custo é rateado pelos km que você rodou no mês do gasto.\n\nObservação: gastos como alimentação são discutíveis como custo do carro (muitos consideram despesa pessoal). Registre do jeito que fizer sentido pra você." },
+  vidautil: { t:"Vida útil (km)", b:"Quantos km o item costuma durar. Ex: um pneu de R$ 1.200 que dura 40.000 km custa R$ 0,03/km. Se não souber, use uma estimativa conservadora." },
+};
+
 /* ---------- App ---------- */
 function App(){
   const [state,setState] = useState(loadState);
@@ -541,12 +862,17 @@ function App(){
   const [sheet,setSheet] = useState(false);
   const [editing,setEditing] = useState(null);
   const [toast,setToast] = useState("");
+  const [info,setInfo] = useState(null); // chave do tooltip aberto
   const toastTimer = useRef();
 
   useEffect(()=>{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }, [state]);
 
   const notify = m => { setToast(m); clearTimeout(toastTimer.current); toastTimer.current=setTimeout(()=>setToast(""),1900); };
   const go = t => { setTab(t); setSheet(false); window.scrollTo({top:0,behavior:"smooth"}); };
+  const openInfo = key => setInfo(key);
+
+  const custoKm = useMemo(()=>custoExtraKm(state.custos, state.despesas, state.periodos), [state]);
+  const breakdown = useMemo(()=>custoBreakdown(state.custos, state.despesas, state.periodos), [state]);
 
   const savePeriodo = f => {
     if(num(f.faturamento)===0 && num(f.km)===0){ notify("Informe faturamento e/ou km"); return; }
@@ -557,43 +883,58 @@ function App(){
   };
   const editPeriodo = p => { setEditing(p); go("registrar"); };
   const deletePeriodo = id => { if(confirm("Excluir este período?")){ setState(s=>({...s,periodos:s.periodos.filter(p=>p.id!==id)})); notify("Excluído"); } };
-  const saveCustos = c => { setState(s=>({...s,custos:{depreciacao:num(c.depreciacao),manutencao:num(c.manutencao),seguro:num(c.seguro),outros:num(c.outros)}})); notify("Custos salvos"); go("dashboard"); };
-  const importData = d => { setState({periodos:d.periodos, custos:Object.assign({},defaultState.custos,d.custos||{})}); notify("Backup importado"); go("dashboard"); };
+  const saveCustos = c => { setState(s=>({...s,custos:Object.assign({},defaultCustos,c,{depreciacao:num(c.depreciacao),manutencao:num(c.manutencao),seguro:num(c.seguro),outros:num(c.outros),seguroMensal:num(c.seguroMensal),kmMes:num(c.kmMes)})})); notify("Custos salvos"); go("dashboard"); };
+  const addDespesa = d => { setState(s=>({...s, despesas:[...s.despesas, d]})); notify("Despesa adicionada"); };
+  const delDespesa = id => { setState(s=>({...s, despesas:s.despesas.filter(d=>d.id!==id)})); notify("Despesa removida"); };
+  const importData = d => { setState({periodos:d.periodos||[], custos:Object.assign({},defaultCustos,d.custos||{}), despesas:Array.isArray(d.despesas)?d.despesas:[]}); notify("Backup importado"); go("dashboard"); };
   const wipe = () => { if(confirm("Apagar TODOS os dados deste dispositivo?") && confirm("Confirmar? Isso não pode ser desfeito.")){ setState(JSON.parse(JSON.stringify(defaultState))); notify("Tudo apagado"); go("dashboard"); } };
 
   const isMais = tab==="config" || tab==="exportar";
+  const title = tab==="dashboard"?"Meus ganhos":tab==="registrar"?"Registrar":tab==="historico"?"Histórico":tab==="config"?"Custos":"Exportar";
+  const infoData = info ? INFOS[info] : null;
 
   return (
     <div className="wrap">
       <div className="top">
-        <div>
-          <div className="hello">Olá, Juarez</div>
-          <div className="title">{tab==="dashboard"?"Meus ganhos":tab==="registrar"?"Registrar":tab==="historico"?"Histórico":tab==="config"?"Custos":"Exportar"}</div>
-        </div>
+        <div><div className="hello">Olá, Juarez</div><div className="title">{title}</div></div>
         <button className="iconbtn" onClick={()=>go("config")} aria-label="Custos">{I.gear}</button>
       </div>
 
-      {tab==="dashboard" && <Dashboard periodos={state.periodos} custos={state.custos} go={go} />}
-      {tab==="registrar" && <Registrar custos={state.custos} onSave={savePeriodo} editing={editing} onCancel={()=>{setEditing(null);}} />}
-      {tab==="historico" && <Historico periodos={state.periodos} custos={state.custos} onEdit={editPeriodo} onDelete={deletePeriodo} />}
-      {tab==="config" && <Custos custos={state.custos} onSave={saveCustos} />}
-      {tab==="exportar" && <Exportar state={state} custos={state.custos} onImport={importData} onWipe={wipe} />}
+      {tab==="dashboard" && <Dashboard periodos={state.periodos} custoKm={custoKm} breakdown={breakdown} go={go} />}
+      {tab==="registrar" && <Registrar custoKm={custoKm} onSave={savePeriodo} editing={editing} onCancel={()=>setEditing(null)} onInfo={openInfo} />}
+      {tab==="historico" && <Historico periodos={state.periodos} custoKm={custoKm} onEdit={editPeriodo} />}
+      {tab==="config" && <Custos custos={state.custos} despesas={state.despesas} periodos={state.periodos} onSaveCustos={saveCustos} onAddDespesa={addDespesa} onDelDespesa={delDespesa} onInfo={openInfo} />}
+      {tab==="exportar" && <Exportar state={state} custoKm={custoKm} onImport={importData} onWipe={wipe} />}
 
       {tab==="registrar" && editing && (
         <div className="btnrow"><button className="btn danger" onClick={()=>{deletePeriodo(editing.id); setEditing(null); go("historico");}}>Excluir este período</button></div>
       )}
 
-      {/* overlay + sheet */}
-      <div className={"ov"+(sheet?" open":"")} onClick={()=>setSheet(false)}></div>
-      <div className={"sheet"+(sheet?" open":"")}>
-        <div className="grab"></div>
-        <button className={"sheet-item"+(tab==="config"?" on":"")} onClick={()=>go("config")}>
-          <span className="si">{I.gear}</span> Custos por km <span className="chev">{I.chev}</span>
-        </button>
-        <button className={"sheet-item"+(tab==="exportar"?" on":"")} onClick={()=>go("exportar")}>
-          <span className="si">{I.download}</span> Backup e exportar <span className="chev">{I.chev}</span>
-        </button>
-      </div>
+      {/* overlay compartilhado (sheet ou tooltip) */}
+      <div className={"ov"+((sheet||info)?" open":"")} onClick={()=>{setSheet(false); setInfo(null);}}></div>
+
+      {/* tooltip sheet */}
+      {infoData && (
+        <div className="sheet open">
+          <div className="grab"></div>
+          <h4>{infoData.t}</h4>
+          {infoData.b.split("\n\n").map((par,i)=><p key={i}>{par}</p>)}
+          <button className="btn close" onClick={()=>setInfo(null)}>Entendi</button>
+        </div>
+      )}
+
+      {/* menu Mais */}
+      {!infoData && (
+        <div className={"sheet"+(sheet?" open":"")}>
+          <div className="grab"></div>
+          <button className={"sheet-item"+(tab==="config"?" on":"")} onClick={()=>go("config")}>
+            <span className="si">{I.gear}</span> Custos e despesas <span className="chev">{I.chev}</span>
+          </button>
+          <button className={"sheet-item"+(tab==="exportar"?" on":"")} onClick={()=>go("exportar")}>
+            <span className="si">{I.download}</span> Backup e exportar <span className="chev">{I.chev}</span>
+          </button>
+        </div>
+      )}
 
       {/* tabbar */}
       <nav className="tabbar">
